@@ -1,4 +1,5 @@
 const {REST, Routes, Client, GatewayIntentBits, Partials, ActivityType} = require('discord.js')
+const express = require('express')
 
 const handleCommand = require('./handlers/handleCommand.js')
 const handleButton = require('./handlers/handleButton.js')
@@ -73,3 +74,9 @@ module.exports = {
 process.on('unhandledRejection', error => {
 	console.error('Unhandled promise rejection:', error);
 });
+
+const app = express()
+app.get('/', (req, res) => {
+	res.send('h')
+})
+app.listen(3000)
