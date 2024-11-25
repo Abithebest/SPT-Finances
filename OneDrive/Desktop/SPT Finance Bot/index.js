@@ -66,8 +66,6 @@ setTimeout(function() {
 })();
 }, 1000)
 
-require('./server.js')
-
 module.exports = {
 	client
 }
