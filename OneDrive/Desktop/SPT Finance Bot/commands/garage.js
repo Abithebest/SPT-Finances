@@ -37,8 +37,8 @@ module.exports = {
 		description: 'Send a garage report for a given date.',
 		options: [
 			{
-				name: 'id',
-				description: 'Garage ID',
+				name: 'query',
+				description: 'Garage ID or name.',
 				type: 3,
 				required: true,
 				autocomplete: true
