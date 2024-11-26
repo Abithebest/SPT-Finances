@@ -88,7 +88,7 @@ let compare = (num1, num2) => {
 async function request(url, method, body) {
   var myHeaders = new Headers();
   myHeaders.append('User-Agent', 'Sonny Pruitt Trucking')
-  myHeaders.append('x-axxess-token', process.env['companyToken'])
+  myHeaders.append('x-access-token', process.env['companyToken'])
 
   let req = await fetch(`https://e.truckyapp.com/api/v1/${url}`, {
     method,
