@@ -10,7 +10,6 @@ let specialGarages = [
 
 async function getGarage(data) {
 	let [gCode, companyGarages] = await request('company/9559/garages', 'GET')
-	console.error(gCode)
 
 	if(gCode == 200) {
 		companyGarages = JSON.parse(companyGarages)
@@ -20,7 +19,6 @@ async function getGarage(data) {
 		await companyGarages.map(gData => {
 			garageByName[gData.city.name.toLowerCase()] = gData;
 		})
-		console.error(garageByName)
 
 		if(garageById[data]) {
 			return garageById[data];

@@ -71,6 +71,6 @@ module.exports = {
 	client
 }
 
-/*process.on('unhandledRejection', error => {
+process.on('unhandledRejection', error => {
 	console.error('Unhandled promise rejection:', error);
-});*/
+});
