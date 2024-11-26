@@ -26,9 +26,9 @@ async function getGarage(data) {
 		if(garageByName[data.toLowerCase()]) {
 			return garageByName[data.toLowerCase()];
 		}
+	} else {
+		return false;
 	}
-
-	return false;
 }
 
 module.exports = {
