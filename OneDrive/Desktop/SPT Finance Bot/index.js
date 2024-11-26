@@ -74,9 +74,3 @@ module.exports = {
 process.on('unhandledRejection', error => {
 	console.error('Unhandled promise rejection:', error);
 });
-
-const app = express()
-app.get('/', (req, res) => {
-	res.send('h')
-})
-app.listen(3000)

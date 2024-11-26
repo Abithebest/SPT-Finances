@@ -1,4 +1,4 @@
-let { request, verifiedUsers, isDateInRange, getObject, formatNum, currency } = require('../utils.js')
+let { request, verifiedUsers, isDateInRange, getObject, formatNum, currency, uppercase } = require('../utils.js')
 let { EmbedBuilder } = require('discord.js')
 let specialGarages = [
   22662,
@@ -7,6 +7,29 @@ let specialGarages = [
   16521,
   22263
 ];
+
+async function getGarage(data) {
+	let [gCode, companyGarages] = await request('company/9559/garages', 'GET')
+
+	if(gCode == 200) {
+		companyGarages = JSON.parse(companyGarages)
+
+		let garageById = getObject(companyGarages, '_id')
+		let garageByName = new Object()
+		companyGarages.map(gData => {
+			garageByName[gData.city.name.toLowerCase()] = gData;
+		})
+
+		if(garageById[data]) {
+			return garageById[data];
+		}
+		if(garageByName[data.toLowerCase()]) {
+			return garageByName[data.toLowerCase()];
+		}
+	}
+
+	return false;
+}
 
 module.exports = {
 	command: {
@@ -45,9 +68,15 @@ module.exports = {
       return;
     }
 
-		interaction.deferReply()
+		await interaction.deferReply()
 
-		let garageId = parseInt(optionData(params[0]));
+		let garage = await getGarage(optionData(params[0]))
+		if(!garage) {
+			interaction.editReply('Couldnt find garage.')
+			return;
+		}
+
+		let garageId = garage.id;
 		let dateFrom = new Date(optionData(params[1]));
 		let dateTo = new Date(optionData(params[2]));
 
@@ -69,7 +98,6 @@ module.exports = {
 		let dateToFormatted = `${dateTo.getFullYear()}-${dateToMonth<10?'0':''}${dateToMonth}-${dateToDay}T23:59:59Z`;
 
 		let [mtCode, maintenance] = await request('company/9559/maintenances?perPage=99999', 'GET')
-		let [gaCode, garage] = await request(`company/9559/garage/${garageId}`, 'GET')
 		let [mcCode, mechanics] = await request(`company/9559/garage/${garageId}/mechanics`, 'GET')
 		let [vhCode, vehicles] = await request(`company/9559/garage/${garageId}/vehicles`, 'GET')
 		let [drCode, companyDrivers] = await request(`company/9559/members?perPage=9999`, 'GET')
@@ -77,7 +105,6 @@ module.exports = {
 		let drivers = new Object()
 
 		if(mtCode == 200) maintenance = JSON.parse(maintenance).data;
-		if(gaCode == 200) garage = JSON.parse(garage);
 		if(mcCode == 200) mechanics = JSON.parse(mechanics);
 		if(vhCode == 200) vehicles = JSON.parse(vehicles);
 		if(jobCode == 200) jobs = JSON.parse(jobs).data;
