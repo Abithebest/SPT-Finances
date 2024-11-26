@@ -5,7 +5,7 @@ const MongoClient = MongoModule.MongoClient;
 const client = new MongoClient(process.env['mongoToken']);
 
 let currency = 'T¢';
-let verifiedUsers = ['748910218846666894']
+let verifiedUsers = ['748910218846666894', '486806760288550933']
 let Months = [
   "🥳 January",
   "🫶 Febuary",
