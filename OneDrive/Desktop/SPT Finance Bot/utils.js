@@ -89,7 +89,7 @@ async function request(url, method, body) {
   let req = await fetch(`https://e.truckyapp.com/api/v1/${url}`, {
     method,
     headers: {
-      'User-Agent': "Sonny Pruitt Trucking",
+      'User-Agent': "IHateThisAPI",
       'X-ACCESS-TOKEN': process.env['companyToken']
     }
   })
