@@ -234,7 +234,7 @@ module.exports = {
 				if(eData.type == 'maintenance') {
 					earnings -= data.price * .50;
 
-					formattedExpenses.push(`⠀⠀🧰 ${uppercase(data.type)} Maintenance for ${data.vehicle.model.name} \`-${formatNum(data.price.toFixed(0))}${truckyCurrency}\``)
+					formattedExpenses.push(`⠀⠀🧰 ${uppercase(data.type)} Maintenance for ${data.vehicle.model.name} \`-${formatNum(data.price.toFixed(0))}${currency}\``)
 				}
 			})
 
