@@ -10,6 +10,7 @@ let specialGarages = [
 
 async function getGarage(data) {
 	let [gCode, companyGarages] = await request('company/9559/garages', 'GET')
+	console.log(gCode, companyGarages)
 
 	if(gCode == 200) {
 		companyGarages = JSON.parse(companyGarages)
