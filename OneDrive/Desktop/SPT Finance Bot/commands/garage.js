@@ -19,7 +19,6 @@ async function getGarage(data) {
 		await companyGarages.map(gData => {
 			garageByName[gData.city.name.toLowerCase()] = gData;
 		})
-		console.log(garageByName)
 
 		if(garageById[data]) {
 			return garageById[data];
