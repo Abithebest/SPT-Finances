@@ -16,7 +16,7 @@ async function getGarage(data) {
 
 		let garageById = getObject(companyGarages, '_id')
 		let garageByName = new Object()
-		companyGarages.map(gData => {
+		await companyGarages.map(gData => {
 			garageByName[gData.city.name.toLowerCase()] = gData;
 		})
 
