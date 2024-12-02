@@ -10,7 +10,6 @@ let specialGarages = [
 
 async function getGarage(data) {
 	let [gCode, companyGarages] = await request('company/9559/garages', 'GET')
-	console.log(gCode, companyGarages)
 
 	if(gCode == 200) {
 		companyGarages = JSON.parse(companyGarages)
@@ -91,7 +90,7 @@ module.exports = {
 		dateTo.setDate(dateTo.getDate() + 1)
 
 		let dateFromMonth = dateFrom.getMonth() + 1;
-		let dateFromDay = dateFrom.getDate() < 10? `0${dateFrom.getDate()}`:dateFrom.getDate();
+		let dateFromDay = dateFrom.getDate() + 1 < 10? `0${dateFrom.getDate() + 1}`:dateFrom.getDate() + 1;
 		let dateFromFormatted = `${dateFrom.getFullYear()}-${dateFromMonth<10?'0':''}${dateFromMonth}-${dateFromDay}T00:00:00Z`;
 
 		let dateToMonth = dateTo.getMonth() + 1;
