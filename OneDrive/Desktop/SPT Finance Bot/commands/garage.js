@@ -84,17 +84,17 @@ module.exports = {
 		let toSplit = optionData(params[2]).split('-')
 		let formattedWeek = `${fromSplit[0]}/${fromSplit[1]}-${toSplit[0]}/${toSplit[1]}`;
 
-		dateFrom.setDate(dateFrom.getDate() + 1)
 		dateFrom.setUTCHours(0,0,0,0)
 		dateTo.setUTCHours(23,59,59,59)
+    dateFrom.setDate(dateFrom.getDate() + 1)
 		dateTo.setDate(dateTo.getDate() + 1)
 
 		let dateFromMonth = dateFrom.getMonth() + 1;
-		let dateFromDay = dateFrom.getDate() + 1 < 10? `0${dateFrom.getDate() + 1}`:dateFrom.getDate() + 1;
+		let dateFromDay = dateFrom.getDate() < 10? `0${dateFrom.getDate()}`:dateFrom.getDate();
 		let dateFromFormatted = `${dateFrom.getFullYear()}-${dateFromMonth<10?'0':''}${dateFromMonth}-${dateFromDay}T00:00:00Z`;
 
 		let dateToMonth = dateTo.getMonth() + 1;
-		let dateToDay = dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate();
+		let dateToDay = dateTo.getDate() + 1 < 10? `0${dateTo.getDate() + 1}`:dateTo.getDate() + 1;
 		let dateToFormatted = `${dateTo.getFullYear()}-${dateToMonth<10?'0':''}${dateToMonth}-${dateToDay}T23:59:59Z`;
 
 		let [mtCode, maintenance] = await request('company/9559/maintenances?perPage=99999', 'GET')
@@ -121,22 +121,16 @@ module.exports = {
 
 			for(let i2=0;i2<driverJobs.length;i2++) {
 				let job = driverJobs[i2];
-				gFuelCost += job.fuel_cost;
-				gFuelUsed += job.fuel_used;
 
 				if(drivers[driverId]) {
 					if(drivers[driverId].salary) {
 						drivers[driverId].salary += job.driven_distance_km * driverSalary;
-					} else {
-						drivers[driverId].salary = job.driven_distance_km * driverSalary;
+						drivers[driverId].fuel.cost += job.fuel_cost;
+						drivers[driverId].fuel.used += job.fuel_used;
 					}
 				} else {
-					drivers[driverId] = { driver, salary: job.driven_distance_km * driverSalary, expenses: [] };
+					drivers[driverId] = { driver, salary: job.driven_distance_km * driverSalary, fuel: { cost: job.fuel_cost, used: job.fuel_used }, expenses: [] };
 				}
-			}
-
-			if(!specialGarages.includes[garageId]) {
-				earnings += drivers[driverId] ? drivers[driverId].salary:0;
 			}
 		}
 
@@ -195,6 +189,15 @@ module.exports = {
 		vehicles.map(vData => { 
 			if(!gdriverIds.includes(vData.driver.id)) {
 				gdriverIds.push(vData.driver.id)
+
+				if(drivers[vData.driver.id]) {
+					gFuelCost += drivers[vData.driver.id].fuel.cost;
+					gFuelUsed += drivers[vData.driver.id].fuel.used;
+
+					if(!specialGarages.includes[garageId]) {
+						earnings += drivers[vData.driver.id].salary
+					}
+				}
 			}
 		})
 
@@ -232,7 +235,7 @@ module.exports = {
 					formattedExpenses.push(`⠀⠀🚛 #${data.id} ${truckModel} \`-${formatNum((data.price * .50).toFixed(0))}${currency}\` ${!specialGarages.includes(garageId)?paidOff:''}`)
 				}
 				if(eData.type == 'maintenance') {
-					earnings -= data.price * .50;
+					earnings -= data.price;
 
 					formattedExpenses.push(`⠀⠀🧰 ${uppercase(data.type)} Maintenance for ${data.vehicle.model.name} \`-${formatNum(data.price.toFixed(0))}${currency}\``)
 				}
