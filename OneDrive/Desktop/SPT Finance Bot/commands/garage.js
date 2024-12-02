@@ -257,7 +257,7 @@ module.exports = {
 		}
 
 		if(!specialGarages.includes(garageId)) {
-			description += `\n\n**💵 General Expenses**\n⠀⠀🧑‍🔧 Mechanic Salaries \`-${mechanicSalaries}${currency}\`\n⠀⠀⛽ Fuel Cost \`${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))} g.)\``;
+			description += `\n\n**💵 General Expenses**\n⠀⠀🧑‍🔧 Mechanic Salaries \`-${mechanicSalaries}${currency}\`\n⠀⠀⛽ Fuel Cost \`${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))}gl.)\``;
 		} else {
 			description += `\n\n🧑‍🔧 Mechanic Salaries \`-${mechanicSalaries}${currency}\`\n⛽ Fuel Cost \`${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))} g.)\``;
 		}
