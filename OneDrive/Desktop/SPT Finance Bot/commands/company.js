@@ -201,7 +201,7 @@ module.exports = {
     embedArrays.unshift(CompanyEmbed)
 
     interaction.editReply({
-      content: `💶 Trucky Payroll & Expenses **${formattedWeek}**`,
+      content: `💵 Trucky Payroll & Expenses **${formattedWeek}**`,
       embeds: embedArrays
     })
   }
