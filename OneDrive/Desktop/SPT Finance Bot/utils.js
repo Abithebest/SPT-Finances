@@ -90,7 +90,7 @@ async function request(url, method = 'GET', body) {
     method,
     headers: {
       "User-Agent": "Sonny Pruitt Trucking",
-      "x-access-token": process.env['companyToken'],
+      "x-access-token": process.env['CompanyToken'],
       "Accept": "application/json"
     }
   })
