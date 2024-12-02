@@ -205,7 +205,7 @@ module.exports = {
 			earnings -= mechanic.weekly_salary;
 		}
 
-		let description = `🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() + 1 < 10? `0${dateTo.getDate() + 1}`:dateTo.getDate() + 1}/${dateTo.getFullYear()-2000}\`\n🏪 **${garage.city.name} Office Expenses ${formattedWeek}**`;
+		let description = `🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🏪 **${garage.city.name} Office Expenses ${formattedWeek}**`;
 		let formattedDrivers = new Array()
 		gdriverIds.map(driverId => {
 			if(!drivers[driverId]) return;
