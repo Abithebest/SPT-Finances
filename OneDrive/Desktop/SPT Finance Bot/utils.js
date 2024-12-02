@@ -85,16 +85,17 @@ let compare = (num1, num2) => {
 	}
 }
 
-async function request(url, method, body) {
-  let req = await fetch(`https://e.truckyapp.com/api/v1/${url}`, {
+async function request(url, method = 'GET', body) {
+  let req = await axios[method.toLowerCase()](`https://e.truckyapp.com/api/v1/${url}`, {
     method,
     headers: {
       "User-Agent": "Sonny Pruitt Trucking",
-      "X-ACCESS-TOKEN": process.env['companyToken']
+      "x-access-token": process.env['companyToken'],
+      "Accept": "application/json"
     }
   })
 
-  return [ req.status, await req.text() ];
+  return [ req.status, JSON.stringify(req.data) ];
 }
 
 let commands = []
