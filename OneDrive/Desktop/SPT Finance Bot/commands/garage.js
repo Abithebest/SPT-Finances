@@ -90,11 +90,11 @@ module.exports = {
 		dateTo.setDate(dateTo.getDate() + 1)
 
 		let dateFromMonth = dateFrom.getMonth() + 1;
-		let dateFromDay = dateFrom.getDate() < 10? `0${dateFrom.getDate()}`:dateFrom.getDate();
+		let dateFromDay = dateFrom.getDate() + 1 < 10? `0${dateFrom.getDate() + 1}`:dateFrom.getDate() + 1;
 		let dateFromFormatted = `${dateFrom.getFullYear()}-${dateFromMonth<10?'0':''}${dateFromMonth}-${dateFromDay}T00:00:00Z`;
 
 		let dateToMonth = dateTo.getMonth() + 1;
-		let dateToDay = dateTo.getDate() + 1 < 10? `0${dateTo.getDate() + 1}`:dateTo.getDate() + 1;
+		let dateToDay = dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate();
 		let dateToFormatted = `${dateTo.getFullYear()}-${dateToMonth<10?'0':''}${dateToMonth}-${dateToDay}T23:59:59Z`;
 
 		let [mtCode, maintenance] = await request('company/9559/maintenances?perPage=99999', 'GET')
