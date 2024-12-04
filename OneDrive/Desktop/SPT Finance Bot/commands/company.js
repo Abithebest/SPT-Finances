@@ -50,13 +50,13 @@ module.exports = {
 		let dateFromFormatted = `${dateFrom.getFullYear()}-${dateFromMonth<10?'0':''}${dateFromMonth}-${dateFromDay}T00:00:00Z`;
 
 		let dateToMonth = dateTo.getMonth() + 1;
-		let dateToDay = dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate();
+		let dateToDay = dateTo.getDate() + 1 < 10? `0${dateTo.getDate() + 1}`:dateTo.getDate() + 1;
 		let dateToFormatted = `${dateTo.getFullYear()}-${dateToMonth<10?'0':''}${dateToMonth}-${dateToDay}T23:59:59Z`;
 
 		let [drCode, companyDrivers] = await request(`company/9559/members?perPage=9999`, 'GET')
 		let [jobCode, jobs] = await request(`company/9559/jobs?perPage=9999&dateFrom=${dateFromFormatted}&dateTo=${dateToFormatted}&status=completed`, 'GET')
 
-		if(jobCode == 200) jobs = JSON.parse(jobs).data.filter(jData => isDateInRange(jData.completed_at, dateFromFormatted, dateToFormatted))
+		if(jobCode == 200) jobs = JSON.parse(jobs).data.filter(jData => isDateInRange(jData.updated_at, dateFrom, dateTo))
 		if(drCode == 200) companyDrivers = getObject(JSON.parse(companyDrivers).data, 'id');
 
     let companyData = await db.collection('Companies').findOne({ ServerId: interaction.guildId })
@@ -83,7 +83,6 @@ module.exports = {
     let rankings = companyData.Finances || new Object();
 
     jobs.map(jobData => {
-      console.log(jobData)
       statistics.totalDamages += jobData.damage_cost;
       statistics.totalRentals += jobData.rent_cost_total;
       statistics.fuelUsed += jobData.fuel_used;

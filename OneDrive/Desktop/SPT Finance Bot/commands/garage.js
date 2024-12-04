@@ -94,7 +94,7 @@ module.exports = {
 		let dateFromFormatted = `${dateFrom.getFullYear()}-${dateFromMonth<10?'0':''}${dateFromMonth}-${dateFromDay}T00:00:00Z`;
 
 		let dateToMonth = dateTo.getMonth() + 1;
-		let dateToDay = dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate();
+		let dateToDay = dateTo.getDate() + 1 < 10? `0${dateTo.getDate() + 1}`:dateTo.getDate() + 1;
 		let dateToFormatted = `${dateTo.getFullYear()}-${dateToMonth<10?'0':''}${dateToMonth}-${dateToDay}T23:59:59Z`;
 
 		let [mtCode, maintenance] = await request('company/9559/maintenances?perPage=99999', 'GET')
@@ -107,7 +107,7 @@ module.exports = {
 		if(mtCode == 200) maintenance = JSON.parse(maintenance).data;
 		if(mcCode == 200) mechanics = JSON.parse(mechanics);
 		if(vhCode == 200) vehicles = JSON.parse(vehicles);
-		if(jobCode == 200) jobs = JSON.parse(jobs).data;
+		if(jobCode == 200) jobs = JSON.parse(jobs).data.filter(jData => isDateInRange(jData.updated_at, dateFromFormatted, dateToFormatted));
 		if(drCode == 200) companyDrivers = getObject(JSON.parse(companyDrivers).data, 'id');
 
 		let earnings = 0;
@@ -208,7 +208,7 @@ module.exports = {
 			earnings -= mechanic.weekly_salary;
 		}
 
-		let description = `🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🏪 **${garage.city.name} Office Expenses ${formattedWeek}**`;
+		let description = `🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🏪 **${garage.city.name} Office Expenses ${formattedWeek}**\n⠀⠀⛽ Fuel Cost \`${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))} gl.)\``;
 		let formattedDrivers = new Array()
 		gdriverIds.map(driverId => {
 			if(!drivers[driverId]) return;
@@ -259,16 +259,18 @@ module.exports = {
 			}
 		}
 
+		let footerText = `${formatNum(earnings.toFixed(0))}${currency} after expenses. ${earnings >= 0?'💵':'💳'}`;
 		if(!specialGarages.includes(garageId)) {
-			description += `\n\n**💵 General Expenses**\n⠀⠀🧑‍🔧 Mechanic Salaries \`-${mechanicSalaries}${currency}\`\n⠀⠀⛽ Fuel Cost \`${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))}gl.)\``;
+			description += `\n\n**💵 General Expenses**\n⠀⠀🧑‍🔧 Mechanic Salaries \`-${formatNum(mechanicSalaries)}${currency}\``;
 		} else {
-			description += `\n\n🧑‍🔧 Mechanic Salaries \`-${mechanicSalaries}${currency}\`\n⛽ Fuel Cost \`${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))} g.)\``;
+			description += `\n\n🧑‍🔧 Mechanic Salaries \`-${formatNum(mechanicSalaries)}${currency}\``;
+			footerText = `Total Office Expenses: ${formatNum(earnings.toFixed(0))}${currency}`
 		}
  
 		let GarageEmbed = new EmbedBuilder()
 			.setDescription(description)
 			.setColor('Random')
-			.setFooter({ text: `${formatNum(earnings.toFixed(0))}${currency} after expenses. ${earnings >= 0?'💵':'💳'}` })
+			.setFooter({ text: footerText })
 
 		interaction.editReply({
 			embeds: [GarageEmbed]
