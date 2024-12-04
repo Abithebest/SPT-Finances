@@ -135,10 +135,10 @@ module.exports = {
     Object.keys(statistics).map(sData => {
       switch(sData) {
         case 'realMileIncome':
-          statValues[sData] = `💰 **Total Income** \`+${formatNum(statistics['realMileIncome'].toFixed(0))}${currency}\` ${compare(rankings.realMileIncome || 0, statistics.realMileIncome)}`;
+          statValues[sData] = `💰 **Real Mile Income** \`+${formatNum(statistics['realMileIncome'].toFixed(0))}${currency}\` ${compare(rankings.realMileIncome || 0, statistics.realMileIncome)}`;
           return;
         case 'realMileRevenue':
-          statValues[sData] = `💵 **Total Revenue** \`+${formatNum(statistics['realMileRevenue'].toFixed(0))}${currency}\` ${compare(rankings.realMileRevenue || 0, statistics.realMileRevenue)}`;
+          statValues[sData] = `💵 **Real Mile Revenue** \`+${formatNum(statistics['realMileRevenue'].toFixed(0))}${currency}\` ${compare(rankings.realMileRevenue || 0, statistics.realMileRevenue)}`;
           return;
         case 'totalDamages':
           statValues[sData] = `💢 **Total Damages** \`-${formatNum(statistics['totalDamages'].toFixed(0))}${currency}\` ${compare(rankings.totalDamages || 0, statistics.totalDamages)}`;
@@ -194,7 +194,7 @@ module.exports = {
     let CompanyEmbed = new EmbedBuilder()
       .setTitle('🏢 Company Weekly Statistics')
       .setDescription(
-        `${statValues['realMileIncome']}\n${statValues['totalDamages']}\n${statValues['totalFines']}\n${statValues['totalRentals']}\n${statValues['fuelUsed']}\n${statValues['realMileRevenue']}\n${statValues['salaries']}\n${statValues['garageExpenses']}\n${statValues['profits']}\n${statValues['raceMiles']}\n${statValues['hardcorePoints']}`
+        `***Base Salary is 3 T¢ per km +Rank Bonus  +Achievement Bonus***\n\n${statValues['realMileIncome']}\n${statValues['totalDamages']}\n${statValues['totalFines']}\n${statValues['totalRentals']}\n${statValues['fuelUsed']}\n${statValues['realMileRevenue']}\n${statValues['salaries']}\n${statValues['garageExpenses']}\n${statValues['profits']}\n${statValues['raceMiles']}\n${statValues['hardcorePoints']}`
       )
       .setColor('Random')
 

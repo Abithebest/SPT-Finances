@@ -194,7 +194,7 @@ module.exports = {
 					gFuelCost += drivers[vData.driver.id].fuel.cost;
 					gFuelUsed += drivers[vData.driver.id].fuel.used;
 
-					if(!specialGarages.includes[garageId]) {
+					if(!specialGarages.includes(garageId)) {
 						earnings += drivers[vData.driver.id].salary
 					}
 				}
@@ -229,7 +229,9 @@ module.exports = {
 					}
 
 					driverExpenseCost += data.price * .50;
-					earnings -= data.price * .50;
+					if(driverExpenseCost<salary) {
+						earnings -= data.price * .50;
+					}
 
 					const paidOff = driverExpenseCost<salary?'💵':'💳';
 					formattedExpenses.push(`⠀⠀🚛 #${data.id} ${truckModel} \`-${formatNum((data.price * .50).toFixed(0))}${currency}\` ${!specialGarages.includes(garageId)?paidOff:''}`)
@@ -249,13 +251,14 @@ module.exports = {
 			formattedDrivers.push(`👷‍♂️ **[${driver.name}](https://hub.truckyapp.com/user/${driver.id})**${!specialGarages.includes(garageId)?` | ***Check Amount*** \`${formatNum(salary.toFixed(0))}${currency}\``:''}\n${driverExpenses}`)
 		})
 
-		if(formattedDrivers.length > 0) {
-			description += `\n\n${formattedDrivers.join('\n')}`;
+		let filteredDrivers = formattedDrivers.filter(a => !a.includes('No expenses recorded'))
+		if(filteredDrivers.length > 0) {
+			description += `\n\n${filteredDrivers.join('\n')}`;
 		} else {
 			if(!specialGarages.includes(garageId)) {
-				description += '\n⠀⠀_No driver salaries recorded..._';
+				description += '\n\n⠀⠀_No driver salaries recorded..._';
 			} else {
-				description += '\n⠀⠀_No driver expenses recorded..._';
+				description += '\n\n⠀⠀_No driver expenses recorded..._';
 			}
 		}
 
