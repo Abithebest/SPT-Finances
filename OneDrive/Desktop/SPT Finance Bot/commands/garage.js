@@ -8,6 +8,13 @@ let specialGarages = [
   22263
 ];
 
+/*
+TODO:
+* Rental cost
+* Fine cost
+* Damage cost
+*/
+
 async function getGarage(data) {
 	let [gCode, companyGarages] = await request('company/9559/garages', 'GET')
 
@@ -187,7 +194,7 @@ module.exports = {
 
 		let gdriverIds = new Array()
 		vehicles.map(vData => { 
-			if(!gdriverIds.includes(vData.driver.id)) {
+			if(vData.driver && !gdriverIds.includes(vData.driver.id)) {
 				gdriverIds.push(vData.driver.id)
 
 				if(drivers[vData.driver.id]) {
