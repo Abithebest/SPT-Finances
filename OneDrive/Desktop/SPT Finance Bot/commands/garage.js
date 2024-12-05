@@ -263,9 +263,9 @@ module.exports = {
 			description += `\n\n👷‍♂️ **Active Drivers:**\n${filteredDrivers.join('\n')}`;
 		} else {
 			if(!specialGarages.includes(garageId)) {
-				description += '\n\n⠀⠀_No driver salaries recorded..._';
+				description += '\n\n👷‍♂️ **Active Drivers:**\n⠀⠀_No driver salaries recorded..._';
 			} else {
-				description += '\n\n⠀⠀_No driver expenses recorded..._';
+				description += '\n\n👷‍♂️ **Active Drivers:**\n⠀⠀_No driver expenses recorded..._';
 			}
 		}
 
