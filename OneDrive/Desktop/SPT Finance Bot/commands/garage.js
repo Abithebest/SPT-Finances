@@ -124,6 +124,7 @@ module.exports = {
 
 			for(let i2=0;i2<driverJobs.length;i2++) {
 				let job = driverJobs[i2];
+				if(job.driver.name == 'abuchy') console.log(job)
 
 				if(drivers[driverId]) {
 					if(drivers[driverId].salary) {
@@ -220,7 +221,7 @@ module.exports = {
 			earnings -= mechanic.weekly_salary;
 		}
 
-		let description = `🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🏪 **${garage.city.name} Office Expenses ${formattedWeek}**${gFuelCost > 0 ? `\n⠀⠀⛽ Fuel Cost \`${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))} gl.)\``: ''}${truckDamage > 0 ? `\n⠀⠀💥 Truck Damage Expenses: \`-${formatNum(truckDamage.toFixed(0))}${currency}\``:''}${truckRentals > 0 ? `\n⠀⠀🛻 Truck Rentals: \`-${formatNum(truckRentals.toFixed(0))}${currency}\``:''}`;
+		let description = `🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🏪 **${garage.city.name} Office Expenses ${formattedWeek}**${gFuelCost > 0 ? `\n⠀⠀⛽ Fuel Cost \`-${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))} gl.)\``: ''}${truckDamage > 0 ? `\n⠀⠀💥 Truck Damage Expenses: \`-${formatNum(truckDamage.toFixed(0))}${currency}\``:''}${truckRentals > 0 ? `\n⠀⠀🛻 Truck Rentals: \`-${formatNum(truckRentals.toFixed(0))}${currency}\``:''}`;
 		let formattedDrivers = new Array()
 		gdriverIds.map(driverId => {
 			if(!drivers[driverId]) return;
@@ -255,17 +256,23 @@ module.exports = {
 				}
 			})
 
-			let driverExpenses = '⠀⠀_No expenses recorded..._';
+			let driverExpenses = '';
 			if(formattedExpenses.length > 0) {
 				driverExpenses = formattedExpenses.join('\n');
 			}
 
-			formattedDrivers.push(`⠀⠀**[${driver.name}](https://hub.truckyapp.com/user/${driver.id})**${!specialGarages.includes(garageId)?` | ***Check Amount*** \`${formatNum(salary.toFixed(0))}${currency}\``:''}\n${driverExpenses}`)
+			if(driverExpenses.length == 0) return;
+
+			formattedDrivers.push(`⠀⠀**[${driver.name}](https://hub.truckyapp.com/user/${driver.id})**${!specialGarages.includes(garageId)?` | ***Check Amount*** \`${formatNum(salary.toFixed(0))}${currency}\``:''}${driverExpenses.length > 0 ? `\n${driverExpenses}`:''}`)
 		})
 
-		let filteredDrivers = formattedDrivers.filter(a => !a.includes('No expenses recorded'))
-		if(filteredDrivers.length > 0) {
-			description += `\n\n👷‍♂️ **Active Drivers:**\n${filteredDrivers.join('\n')}`;
+		if(formattedDrivers.length > 0) {
+			if(!specialGarages.includes(garageId)) {
+				description += `\n\n👷‍♂️ **Active Drivers:**\n${formattedDrivers.join('\n')}`;
+			} else {
+				let filteredDrivers = formattedDrivers.filter(a => a != undefined)
+				description += `\n\n👷‍♂️ **Active Drivers:**\n${filteredDrivers.join('\n')}`;
+			}
 		} else {
 			if(!specialGarages.includes(garageId)) {
 				description += '\n\n👷‍♂️ **Active Drivers:**\n⠀⠀_No driver salaries recorded..._';
