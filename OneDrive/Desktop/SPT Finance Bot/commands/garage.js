@@ -261,7 +261,7 @@ module.exports = {
 				driverExpenses = formattedExpenses.join('\n');
 			}
 
-			if(driverExpenses.length == 0) return;
+			if(driverExpenses.length == 0 && salary <= 0) return;
 
 			formattedDrivers.push(`⠀⠀**[${driver.name}](https://hub.truckyapp.com/user/${driver.id})**${!specialGarages.includes(garageId)?` | ***Check Amount*** \`${formatNum(salary.toFixed(0))}${currency}\``:''}${driverExpenses.length > 0 ? `\n${driverExpenses}`:''}`)
 		})
