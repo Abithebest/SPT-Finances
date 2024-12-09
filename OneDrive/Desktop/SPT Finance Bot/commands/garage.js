@@ -91,8 +91,8 @@ module.exports = {
 
 		dateFrom.setUTCHours(0,0,0,0)
 		dateTo.setUTCHours(23,59,59,59)
-    dateFrom.setDate(dateFrom.getDate())
-		dateTo.setDate(dateTo.getDate())
+    dateFrom.setDate(dateFrom.getDate() + 1)
+		dateTo.setDate(dateTo.getDate() + 1)
 
 		let dateFromMonth = dateFrom.getMonth() + 1;
 		let dateFromDay = dateFrom.getDate() < 10? `0${dateFrom.getDate()}`:dateFrom.getDate();
@@ -112,7 +112,7 @@ module.exports = {
 		if(mtCode == 200) maintenance = JSON.parse(maintenance).data;
 		if(mcCode == 200) mechanics = JSON.parse(mechanics);
 		if(vhCode == 200) vehicles = JSON.parse(vehicles);
-		if(jobCode == 200) jobs = JSON.parse(jobs).data.filter(jData => isDateInRange(jData.updated_at, dateFromFormatted, dateToFormatted));
+		if(jobCode == 200) jobs = JSON.parse(jobs).data.filter(jData => isDateInRange(jData.updated_at, dateFrom, dateTo));
 		if(drCode == 200) companyDrivers = getObject(JSON.parse(companyDrivers).data, 'id');
 
 		let earnings = 0;
@@ -124,7 +124,6 @@ module.exports = {
 
 			for(let i2=0;i2<driverJobs.length;i2++) {
 				let job = driverJobs[i2];
-				if(job.driver.name == 'abuchy') console.log(job)
 
 				if(drivers[driverId]) {
 					if(drivers[driverId].salary) {
@@ -261,7 +260,7 @@ module.exports = {
 				driverExpenses = formattedExpenses.join('\n');
 			}
 
-			if(driverExpenses.length == 0 && salary <= 0) return;
+			if(salary <= 0 && driverExpenses.length == 0) return;
 
 			formattedDrivers.push(`⠀⠀**[${driver.name}](https://hub.truckyapp.com/user/${driver.id})**${!specialGarages.includes(garageId)?` | ***Check Amount*** \`${formatNum(salary.toFixed(0))}${currency}\``:''}${driverExpenses.length > 0 ? `\n${driverExpenses}`:''}`)
 		})
