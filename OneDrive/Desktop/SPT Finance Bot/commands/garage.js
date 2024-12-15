@@ -119,22 +119,24 @@ module.exports = {
 		for(let i=0;i<Object.keys(companyDrivers).length;i++) {
 			let driverId = Object.keys(companyDrivers)[i];
 			let driver = companyDrivers[driverId];
-			let driverSalary = 3 + companyDrivers[driverId].role.additional_member_salary;
-			let driverJobs = jobs.filter(jData => jData.driver.id == driverId)
+			if(driver) {
+				let driverSalary = 3 + companyDrivers[driverId].role.additional_member_salary;
+				let driverJobs = jobs.filter(jData => jData.driver.id == driverId)
 
-			for(let i2=0;i2<driverJobs.length;i2++) {
-				let job = driverJobs[i2];
+				for(let i2=0;i2<driverJobs.length;i2++) {
+					let job = driverJobs[i2];
 
-				if(drivers[driverId]) {
-					if(drivers[driverId].salary) {
-						drivers[driverId].salary += job.driven_distance_km * driverSalary;
-						drivers[driverId].fuel.cost += job.fuel_cost;
-						drivers[driverId].fuel.used += job.fuel_used;
-						drivers[driverId].truck.damage += job.damage_cost;
-						drivers[driverId].truck.rentals += job.rent_cost_total;
+					if(drivers[driverId]) {
+						if(drivers[driverId].salary) {
+							drivers[driverId].salary += job.driven_distance_km * driverSalary;
+							drivers[driverId].fuel.cost += job.fuel_cost;
+							drivers[driverId].fuel.used += job.fuel_used;
+							drivers[driverId].truck.damage += job.damage_cost;
+							drivers[driverId].truck.rentals += job.rent_cost_total;
+						}
+					} else {
+						drivers[driverId] = { driver, salary: job.driven_distance_km * driverSalary, fuel: { cost: job.fuel_cost, used: job.fuel_used }, truck: { damage: job.damage_cost, rentals: job.rent_cost_total }, expenses: [] };
 					}
-				} else {
-					drivers[driverId] = { driver, salary: job.driven_distance_km * driverSalary, fuel: { cost: job.fuel_cost, used: job.fuel_used }, truck: { damage: job.damage_cost, rentals: job.rent_cost_total }, expenses: [] };
 				}
 			}
 		}

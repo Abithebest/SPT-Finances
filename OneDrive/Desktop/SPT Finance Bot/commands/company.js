@@ -106,6 +106,7 @@ module.exports = {
       }
 
       let driver = companyDrivers[jobData.driver.id];
+      if(!driver) return;
       if(!driverData[driver.id]) {
         driverData[driver.id] = {
           salary: 3 + driver.role.additional_member_salary,
