@@ -219,7 +219,11 @@ module.exports = {
 		for(let i=0;i<mechanics.length;i++) {
 			let mechanic = mechanics[i];
 			mechanicSalaries += mechanic.weekly_salary;
-			earnings -= mechanic.weekly_salary;
+			if(!specialGarages.includes(garageId)) {
+				earnings -= mechanic.weekly_salary;
+			} else {
+				earnings += mechanic.weekly_salary;
+			}
 		}
 
 		let description = `🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🏪 **${garage.city.name} Office Expenses ${formattedWeek}**${gFuelCost > 0 ? `\n⠀⠀⛽ Fuel Cost \`-${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))} gl.)\``: ''}${truckDamage > 0 ? `\n⠀⠀💥 Truck Damage Expenses: \`-${formatNum(truckDamage.toFixed(0))}${currency}\``:''}${truckRentals > 0 ? `\n⠀⠀🛻 Truck Rentals: \`-${formatNum(truckRentals.toFixed(0))}${currency}\``:''}`;
@@ -244,14 +248,22 @@ module.exports = {
 
 					driverExpenseCost += data.price * .50;
 					if(driverExpenseCost<salary) {
-						earnings -= data.price * .50;
+						if(!specialGarages.includes(garageId)) {
+							earnings -= data.price * .50;
+						} else {
+							earnings += data.price * .50;
+						}
 					}
 
 					const paidOff = driverExpenseCost<salary?'💵':'💳';
 					formattedExpenses.push(`⠀⠀⠀⠀🚛 #${data.id} ${truckModel} \`-${formatNum((data.price * .50).toFixed(0))}${currency}\` ${!specialGarages.includes(garageId)?paidOff:''}`)
 				}
 				if(eData.type == 'maintenance') {
-					earnings -= data.price;
+					if(!specialGarages.includes(garageId)) {
+						earnings -= data.price;
+					} else {
+						earnings += data.price;
+					}
 
 					formattedExpenses.push(`⠀⠀⠀⠀🧰 ${uppercase(data.type)} Maintenance for ${data.vehicle.model.name} \`-${formatNum(data.price.toFixed(0))}${currency}\``)
 				}
