@@ -115,6 +115,13 @@ module.exports = {
 		if(jobCode == 200) jobs = JSON.parse(jobs).data.filter(jData => isDateInRange(jData.updated_at, dateFrom, dateTo));
 		if(drCode == 200) companyDrivers = getObject(JSON.parse(companyDrivers).data, 'id');
 
+		let gdriverIds = new Array()
+		vehicles.map(vData => { 
+			if(!gdriverIds.includes(vData.driver.id)) {
+				gdriverIds.push(vData.driver.id)
+			}
+		})
+
 		let earnings = 0;
 		for(let i=0;i<Object.keys(companyDrivers).length;i++) {
 			let driverId = Object.keys(companyDrivers)[i];
@@ -149,7 +156,8 @@ module.exports = {
 			let driver = filteredVehicles[0] ? filteredVehicles[0].driver:{};
 
       if(
-        (isDateInRange(date, dateFrom, dateTo))
+        (isDateInRange(date, dateFrom, dateTo)) &&
+				gdriverIds.includes(mData.vehicle.assigned_to_user_id)
       ) {
 				if(!drivers[mData.vehicle.assigned_to_user_id]) {
 					drivers[mData.vehicle.assigned_to_user_id] = { driver, salary: 0, expenses: [ { type: 'maintenance', data: mData } ] }
@@ -159,10 +167,12 @@ module.exports = {
 						data: mData
 					})
 				}
+				console.log(mData)
 
 				if(specialGarages.includes(garageId)) {
 					earnings += mData.price;
 				}
+				console.log(earnings, 'm')
 
         return true;
       }
@@ -173,7 +183,8 @@ module.exports = {
 			let driver = tData.driver;
 
       if(
-        (isDateInRange(date, dateFrom, dateTo))
+        (isDateInRange(date, dateFrom, dateTo)) &&
+				gdriverIds.includes(driver.id)
       ) {
 				if(!drivers[driver.id]) {
 					drivers[driver.id] = { driver, salary: 0, expenses: [ { type: 'truck', data: tData } ] }
@@ -187,6 +198,7 @@ module.exports = {
 				if(specialGarages.includes(garageId)) {
 					earnings += tData.price;
 				}
+				console.log(earnings, 't')
 
         return true;
       }
@@ -197,12 +209,9 @@ module.exports = {
 		let truckDamage = 0;
 		let truckRentals = 0;
 
-		let gdriverIds = new Array()
 		vehicles.map(vData => { 
-			if(vData.driver && !gdriverIds.includes(vData.driver.id)) {
-				gdriverIds.push(vData.driver.id)
-
-				if(drivers[vData.driver.id]) {
+			if(gdriverIds.includes(vData.driver.id)) {
+				if(vData.driver && drivers[vData.driver.id]) {
 					gFuelCost += drivers[vData.driver.id].fuel.cost;
 					gFuelUsed += drivers[vData.driver.id].fuel.used;
 					truckDamage += drivers[vData.driver.id].truck.damage;
@@ -211,6 +220,7 @@ module.exports = {
 					if(!specialGarages.includes(garageId)) {
 						earnings += drivers[vData.driver.id].salary;
 					}
+					console.log(earnings, "d")
 				}
 			}
 		})
@@ -224,11 +234,13 @@ module.exports = {
 			} else {
 				earnings += mechanic.weekly_salary;
 			}
+			console.log(earnings, 'ma')
 		}
 
 		let description = `🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🏪 **${garage.city.name} Office Expenses ${formattedWeek}**${gFuelCost > 0 ? `\n⠀⠀⛽ Fuel Cost \`-${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))} gl.)\``: ''}${truckDamage > 0 ? `\n⠀⠀💥 Truck Damage Expenses: \`-${formatNum(truckDamage.toFixed(0))}${currency}\``:''}${truckRentals > 0 ? `\n⠀⠀🛻 Truck Rentals: \`-${formatNum(truckRentals.toFixed(0))}${currency}\``:''}`;
 		let formattedDrivers = new Array()
 		gdriverIds.map(driverId => {
+			console.log(drivers[driverId])
 			if(!drivers[driverId]) return;
 			let driverData = drivers[driverId];
 			let driver = driverData.driver;
@@ -250,6 +262,7 @@ module.exports = {
 					if(driverExpenseCost<salary && !specialGarages.includes(garageId)) {
 						earnings -= data.price * .50;
 					}
+					console.log(earnings, 't2')
 
 					const paidOff = driverExpenseCost<salary?'💵':'💳';
 					formattedExpenses.push(`⠀⠀⠀⠀🚛 #${data.id} ${truckModel} \`-${formatNum((data.price * .50).toFixed(0))}${currency}\` ${!specialGarages.includes(garageId)?paidOff:''}`)
@@ -258,6 +271,7 @@ module.exports = {
 					if(!specialGarages.includes(garageId)) {
 						earnings -= data.price;
 					}
+					console.log(earnings, 'm2')
 
 					formattedExpenses.push(`⠀⠀⠀⠀🧰 ${uppercase(data.type)} Maintenance for ${data.vehicle.model.name} \`-${formatNum(data.price.toFixed(0))}${currency}\``)
 				}
