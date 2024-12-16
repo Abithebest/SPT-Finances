@@ -247,12 +247,8 @@ module.exports = {
 					}
 
 					driverExpenseCost += data.price * .50;
-					if(driverExpenseCost<salary) {
-						if(!specialGarages.includes(garageId)) {
-							earnings -= data.price * .50;
-						} else {
-							earnings += data.price * .50;
-						}
+					if(driverExpenseCost<salary && !specialGarages.includes(garageId)) {
+						earnings -= data.price * .50;
 					}
 
 					const paidOff = driverExpenseCost<salary?'💵':'💳';
@@ -261,8 +257,6 @@ module.exports = {
 				if(eData.type == 'maintenance') {
 					if(!specialGarages.includes(garageId)) {
 						earnings -= data.price;
-					} else {
-						earnings += data.price;
 					}
 
 					formattedExpenses.push(`⠀⠀⠀⠀🧰 ${uppercase(data.type)} Maintenance for ${data.vehicle.model.name} \`-${formatNum(data.price.toFixed(0))}${currency}\``)
