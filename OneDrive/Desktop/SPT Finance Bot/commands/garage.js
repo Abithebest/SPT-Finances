@@ -167,12 +167,10 @@ module.exports = {
 						data: mData
 					})
 				}
-				console.log(mData)
 
 				if(specialGarages.includes(garageId)) {
 					earnings += mData.price;
 				}
-				console.log(earnings, 'm')
 
         return true;
       }
@@ -198,7 +196,6 @@ module.exports = {
 				if(specialGarages.includes(garageId)) {
 					earnings += tData.price;
 				}
-				console.log(earnings, 't')
 
         return true;
       }
@@ -209,18 +206,15 @@ module.exports = {
 		let truckDamage = 0;
 		let truckRentals = 0;
 
-		vehicles.map(vData => { 
-			if(gdriverIds.includes(vData.driver.id)) {
-				if(vData.driver && drivers[vData.driver.id]) {
-					gFuelCost += drivers[vData.driver.id].fuel.cost;
-					gFuelUsed += drivers[vData.driver.id].fuel.used;
-					truckDamage += drivers[vData.driver.id].truck.damage;
-					truckRentals += drivers[vData.driver.id].truck.rentals;
+		gdriverIds.map(driverId => {
+			if(drivers[driverId]) {
+				gFuelCost += drivers[driverId].fuel.cost;
+				gFuelUsed += drivers[driverId].fuel.used;
+				truckDamage += drivers[driverId].truck.damage;
+				truckRentals += drivers[driverId].truck.rentals;
 
-					if(!specialGarages.includes(garageId)) {
-						earnings += drivers[vData.driver.id].salary;
-					}
-					console.log(earnings, "d")
+				if(!specialGarages.includes(garageId)) {
+					earnings += drivers[driverId].salary;
 				}
 			}
 		})
@@ -234,13 +228,11 @@ module.exports = {
 			} else {
 				earnings += mechanic.weekly_salary;
 			}
-			console.log(earnings, 'ma')
 		}
 
 		let description = `🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🏪 **${garage.city.name} Office Expenses ${formattedWeek}**${gFuelCost > 0 ? `\n⠀⠀⛽ Fuel Cost \`-${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))} gl.)\``: ''}${truckDamage > 0 ? `\n⠀⠀💥 Truck Damage Expenses: \`-${formatNum(truckDamage.toFixed(0))}${currency}\``:''}${truckRentals > 0 ? `\n⠀⠀🛻 Truck Rentals: \`-${formatNum(truckRentals.toFixed(0))}${currency}\``:''}`;
 		let formattedDrivers = new Array()
 		gdriverIds.map(driverId => {
-			console.log(drivers[driverId])
 			if(!drivers[driverId]) return;
 			let driverData = drivers[driverId];
 			let driver = driverData.driver;
@@ -262,7 +254,6 @@ module.exports = {
 					if(driverExpenseCost<salary && !specialGarages.includes(garageId)) {
 						earnings -= data.price * .50;
 					}
-					console.log(earnings, 't2')
 
 					const paidOff = driverExpenseCost<salary?'💵':'💳';
 					formattedExpenses.push(`⠀⠀⠀⠀🚛 #${data.id} ${truckModel} \`-${formatNum((data.price * .50).toFixed(0))}${currency}\` ${!specialGarages.includes(garageId)?paidOff:''}`)
@@ -271,7 +262,6 @@ module.exports = {
 					if(!specialGarages.includes(garageId)) {
 						earnings -= data.price;
 					}
-					console.log(earnings, 'm2')
 
 					formattedExpenses.push(`⠀⠀⠀⠀🧰 ${uppercase(data.type)} Maintenance for ${data.vehicle.model.name} \`-${formatNum(data.price.toFixed(0))}${currency}\``)
 				}
