@@ -116,8 +116,8 @@ module.exports = {
 		if(drCode == 200) companyDrivers = getObject(JSON.parse(companyDrivers).data, 'id');
 
 		let gdriverIds = new Array()
-		vehicles.map(vData => { 
-			if(!gdriverIds.includes(vData.driver.id)) {
+		vehicles.map(vData => {
+			if(vData.driver && !gdriverIds.includes(vData.driver.id)) {
 				gdriverIds.push(vData.driver.id)
 			}
 		})
