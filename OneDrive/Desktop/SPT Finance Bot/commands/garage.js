@@ -10,7 +10,7 @@ let specialGarages = [
 
 /*
 TODO:
-* Next Maintenance - 500 miles or less before maintenance 
+* Next Maintenance - 1000 km or less before maintenance 
 */
 
 async function getGarage(data) {
