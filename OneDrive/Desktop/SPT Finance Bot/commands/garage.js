@@ -10,7 +10,7 @@ let specialGarages = [
 
 /*
 TODO:
-* Fine cost
+* Next Maintenance - 500 miles or less before maintenance 
 */
 
 async function getGarage(data) {
@@ -133,6 +133,14 @@ module.exports = {
 				for(let i2=0;i2<driverJobs.length;i2++) {
 					let job = driverJobs[i2];
 
+					let finesCost = 0;
+					let fines = JSON.parse(job.fines_details);
+					if(fines.length > 0) {
+						fines.forEach((fData) => {
+							finesCost += fData.amount;
+						})
+					}
+
 					if(drivers[driverId]) {
 						if(drivers[driverId].salary) {
 							drivers[driverId].salary += job.driven_distance_km * driverSalary;
@@ -140,9 +148,10 @@ module.exports = {
 							drivers[driverId].fuel.used += job.fuel_used;
 							drivers[driverId].truck.damage += job.damage_cost;
 							drivers[driverId].truck.rentals += job.rent_cost_total;
+							drivers[driverId].fineCost += finesCost;
 						}
 					} else {
-						drivers[driverId] = { driver, salary: job.driven_distance_km * driverSalary, fuel: { cost: job.fuel_cost, used: job.fuel_used }, truck: { damage: job.damage_cost, rentals: job.rent_cost_total }, expenses: [] };
+						drivers[driverId] = { driver, salary: job.driven_distance_km * driverSalary, fineCost: finesCost, fuel: { cost: job.fuel_cost, used: job.fuel_used }, truck: { damage: job.damage_cost, rentals: job.rent_cost_total }, expenses: [] };
 					}
 				}
 			}
@@ -205,6 +214,7 @@ module.exports = {
 		let gFuelUsed = 0;
 		let truckDamage = 0;
 		let truckRentals = 0;
+		let fineCosts = 0;
 
 		gdriverIds.map(driverId => {
 			if(drivers[driverId]) {
@@ -212,6 +222,7 @@ module.exports = {
 				gFuelUsed += drivers[driverId].fuel.used;
 				truckDamage += drivers[driverId].truck.damage;
 				truckRentals += drivers[driverId].truck.rentals;
+				fineCosts += drivers[driverId].fineCost;
 
 				if(!specialGarages.includes(garageId)) {
 					earnings += drivers[driverId].salary;
@@ -230,7 +241,7 @@ module.exports = {
 			}
 		}
 
-		let description = `🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🏪 **${garage.city.name} Office Expenses ${formattedWeek}**${gFuelCost > 0 ? `\n⠀⠀⛽ Fuel Cost \`-${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))} gl.)\``: ''}${truckDamage > 0 ? `\n⠀⠀💥 Truck Damage Expenses: \`-${formatNum(truckDamage.toFixed(0))}${currency}\``:''}${truckRentals > 0 ? `\n⠀⠀🛻 Truck Rentals: \`-${formatNum(truckRentals.toFixed(0))}${currency}\``:''}`;
+		let description = `🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🏪 **${garage.city.name} Office Expenses ${formattedWeek}**${gFuelCost > 0 ? `\n⠀⠀⛽ Fuel Cost \`-${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))} gl.)\``: ''}${truckDamage > 0 ? `\n⠀⠀💥 Truck Damage Expenses: \`-${formatNum(truckDamage.toFixed(0))}${currency}\``:''}${truckRentals > 0 ? `\n⠀⠀🛻 Truck Rentals: \`-${formatNum(truckRentals.toFixed(0))}${currency}\``:''}${fineCosts > 0 ? `\n⠀⠀🎫 Fines: \`-${formatNum(fineCosts.toFixed(0))}${currency}\``:''}`;
 		let formattedDrivers = new Array()
 		gdriverIds.map(driverId => {
 			if(!drivers[driverId]) return;
