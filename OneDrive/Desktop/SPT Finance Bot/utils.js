@@ -86,7 +86,7 @@ let compare = (num1, num2) => {
 }
 
 async function request(url, method = 'GET', body) {
-  let req = await axios[method.toLowerCase()](`https://e.truckyapp.com/api/v1/${url}`, {
+  let req = await axios[method.toLowerCase()](url.startsWith('https')?url:`https://e.truckyapp.com/api/v1/${url}`, {
     method,
     headers: {
       "User-Agent": "Sonny Pruitt Trucking",

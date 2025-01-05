@@ -55,9 +55,11 @@ module.exports = {
 
 		let [drCode, companyDrivers] = await request(`company/9559/members?perPage=9999`, 'GET')
 		let [jobCode, jobs] = await request(`company/9559/jobs?perPage=9999&dateFrom=${dateFromFormatted}&dateTo=${dateToFormatted}&status=completed`, 'GET')
+    //let [vtlCode, vtlJobs] = await request(`https://api.vtlog.net/v1/vtc/5636/jobs?limit=9999`, 'GET')
 
 		if(jobCode == 200) jobs = JSON.parse(jobs).data.filter(jData => isDateInRange(jData.updated_at, dateFrom, dateTo))
 		if(drCode == 200) companyDrivers = getObject(JSON.parse(companyDrivers).data, 'id');
+    //if(vtlCode == 200) vtlJobs = JSON.parse(vtlJobs).data;
 
     let companyData = await db.collection('Companies').findOne({ ServerId: interaction.guildId })
     if(!companyData) {
@@ -83,22 +85,22 @@ module.exports = {
     let rankings = companyData.Finances || new Object();
 
     jobs.map(jobData => {
-      statistics.totalDamages += jobData.damage_cost;
-      statistics.totalRentals += jobData.rent_cost_total;
-      statistics.fuelUsed += jobData.fuel_used;
-      statistics.fuelCost += jobData.fuel_cost;
+      statistics.totalDamages += jobData.damage_cost || 0;
+      statistics.totalRentals += jobData.rent_cost_total || 0;
+      statistics.fuelUsed += jobData.fuel_used || 0;
+      statistics.fuelCost += jobData.fuel_cost || 0;
       if(jobData.stats_type == 'real_miles') {
-        statistics.realMileIncome += jobData.income;
-        statistics.realMileRevenue += jobData.revenue;
+        statistics.realMileIncome += jobData.income || 0;
+        statistics.realMileRevenue += jobData.revenue || 0;
       } else {
-        statistics.raceMiles += jobData.driven_distance_km;
+        statistics.raceMiles += jobData.driven_distance_km || 0;
       }
       if(jobData.realistic_ldb_points != null) {
-        statistics.hardcorePoints += jobData.realistic_ldb_points;
+        statistics.hardcorePoints += jobData.realistic_ldb_points || 0;
         statistics.hardcoreJobs++;
       }
 
-      let fines = JSON.parse(jobData.fines_details);
+      let fines = JSON.parse(jobData.fines_details || "[]");
       if(fines.length > 0) {
         fines.forEach((fData) => {
           statistics.totalFines += fData.amount;
