@@ -197,7 +197,7 @@ module.exports = {
     let CompanyEmbed = new EmbedBuilder()
       .setTitle('🏢 Company Weekly Statistics')
       .setDescription(
-        `***Base Salary is 3 T¢ per km +Rank Bonus  +Achievement Bonus***\n\n${statValues['realMileIncome']}\n${statValues['totalDamages']}\n${statValues['totalFines']}\n${statValues['totalRentals']}\n${statValues['fuelUsed']}\n${statValues['realMileRevenue']}\n${statValues['salaries']}\n${statValues['garageExpenses']}\n${statValues['profits']}\n${statValues['raceMiles']}\n${statValues['hardcorePoints']}`
+        `***Base Salary is 3 T¢ per km +Rank Bonus  +Achievement Bonus***\n\n${statValues['realMileIncome']}\n${statValues['totalDamages']}\n${statValues['totalFines']}\n${statValues['totalRentals']}\n${statValues['fuelUsed']}\n${statValues['realMileRevenue']}\n${statValues['salaries']}\n${statValues['profits']}\n${statValues['raceMiles']}\n${statValues['hardcorePoints']}`
       )
       .setColor('Random')
 
