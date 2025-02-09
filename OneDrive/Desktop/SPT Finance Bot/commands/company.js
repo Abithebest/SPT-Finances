@@ -54,7 +54,7 @@ module.exports = {
 		let dateToFormatted = `${dateTo.getFullYear()}-${dateToMonth<10?'0':''}${dateToMonth}-${dateToDay}T23:59:59Z`;
 
 		let [drCode, companyDrivers] = await request(`company/9559/members?perPage=9999`, 'GET')
-		let [jobCode, jobs] = await request(`company/9559/jobs?perPage=9999&dateFrom=${dateFromFormatted}&dateTo=${dateToFormatted}&status=completed`, 'GET')
+		let [jobCode, jobs] = await request(`company/9559/jobs?perPage=9999&dateFrom=${dateFromFormatted}&dateTo=${dateToFormatted}`, 'GET')
     //let [vtlCode, vtlJobs] = await request(`https://api.vtlog.net/v1/vtc/5636/jobs?limit=9999`, 'GET')
 
 		if(jobCode == 200) jobs = JSON.parse(jobs).data.filter(jData => isDateInRange(jData.updated_at, dateFrom, dateTo))
@@ -85,53 +85,76 @@ module.exports = {
     let rankings = companyData.Finances || new Object();
 
     jobs.map(jobData => {
-      statistics.totalDamages += jobData.damage_cost || 0;
-      statistics.totalRentals += jobData.rent_cost_total || 0;
-      statistics.fuelUsed += jobData.fuel_used || 0;
-      statistics.fuelCost += jobData.fuel_cost || 0;
-      if(jobData.stats_type == 'real_miles') {
-        statistics.realMileIncome += jobData.income || 0;
-        statistics.realMileRevenue += jobData.revenue || 0;
-      } else {
-        statistics.raceMiles += jobData.driven_distance_km || 0;
-      }
-      if(jobData.realistic_ldb_points != null) {
-        statistics.hardcorePoints += jobData.realistic_ldb_points || 0;
-        statistics.hardcoreJobs++;
-      }
-
-      let fines = JSON.parse(jobData.fines_details || "[]");
-      if(fines.length > 0) {
-        fines.forEach((fData) => {
-          statistics.totalFines += fData.amount;
-        })
-      }
-
       let driver = companyDrivers[jobData.driver.id];
       if(!driver) return;
-      if(!driverData[driver.id]) {
-        driverData[driver.id] = {
-          salary: 3 + driver.role.additional_member_salary,
-          revenue: (3 + driver.role.additional_member_salary) * jobData.driven_distance_km,
-          distance: jobData.driven_distance_km,
-          driver
+
+      if(jobData.status == 'completed') {
+        statistics.totalDamages += jobData.damage_cost || 0;
+        statistics.totalRentals += jobData.rent_cost_total || 0;
+        statistics.fuelUsed += jobData.fuel_used || 0;
+        statistics.fuelCost += jobData.fuel_cost || 0;
+        if(jobData.stats_type == 'real_miles') {
+          statistics.realMileIncome += jobData.income || 0;
+          statistics.realMileRevenue += jobData.revenue || 0;
+        } else {
+          statistics.raceMiles += jobData.driven_distance_km || 0;
         }
-      } else {
-        driverData[driver.id].revenue += (3 + driver.role.additional_member_salary) * jobData.driven_distance_km;
-        driverData[driver.id].distance += jobData.driven_distance_km;
+        if(jobData.realistic_ldb_points != null) {
+          statistics.hardcorePoints += jobData.realistic_ldb_points || 0;
+          statistics.hardcoreJobs++;
+        }
+
+        let fines = JSON.parse(jobData.fines_details || "[]");
+        if(fines.length > 0) {
+          fines.forEach((fData) => {
+            statistics.totalFines += fData.amount;
+          })
+        }
+
+        statistics.driverSalaries += (3 + driver.role.additional_member_salary) * jobData.driven_distance_km;
       }
 
-      statistics.driverSalaries += (3 + driver.role.additional_member_salary) * jobData.driven_distance_km;
+      if(!driverData[driver.id]) {
+        let data = { driver, salary: 3 + driver.role.additional_member_salary, canceled: { amount: 0, cost: 0 } }
+        if(jobData.status == 'completed') {
+          data.revenue = (3 + driver.role.additional_member_salary) * jobData.driven_distance_km;
+          data.distance = jobData.driven_distance_km;
+        } else if(jobData.status == 'canceled') {
+          data.revenue = jobData.income * .25;
+          data.distance = 0;
+          data.canceled = { amount: 1, cost: jobData.income * -.25 };
+        }
+
+        driverData[driver.id] = data;
+      } else {
+        if(jobData.status == 'completed') {
+          driverData[driver.id].revenue += (3 + driver.role.additional_member_salary) * jobData.driven_distance_km;
+          driverData[driver.id].distance += jobData.driven_distance_km;
+        } else if(jobData.status == 'canceled') {
+          driverData[driver.id].revenue -= jobData.income * -.25;
+          driverData[driver.id].canceled.amount++;
+          driverData[driver.id].canceled.cost += jobData.income * -.25;
+        }
+      }
     })
 
-    const sortedDrivers = Object.entries(driverData).sort(([, a], [, b]) => b.revenue - a.revenue)
+    const sortedDrivers = Object.entries(driverData).sort(([, a], [, b]) => {
+      if (a.revenue >= 0 && b.revenue >= 0) {
+        return b.revenue - a.revenue;
+      } else if (a.revenue < 0 && b.revenue < 0) {
+        return a.revenue - b.revenue;
+      } else {
+        return a.revenue >= 0 ? -1 : 1;
+      }
+    });
 
     let formattedMembers = new Array();
     for(const [driverId, driver] of sortedDrivers) {
       let driverData = companyDrivers[driverId];
       let role = getRole(driverData.role)
-
-      formattedMembers.push(`🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🤵 **[${driverData.name} ${role.emojis}](https://hub.truckyapp.com/user/${driverData.id})**\n💼 **${role.name}** \`${driver.salary}${currency} /km\`\n💰 ***Check Amount*** \`${formatNum(driver.revenue.toFixed(0))}${currency}\`\n🚛 \`${formatNum(driver.distance.toFixed(0))}km\``);
+      if(!isNaN(driver.revenue)) {
+        formattedMembers.push(`🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🤵 **[${driverData.name} ${role.emojis}](https://hub.truckyapp.com/user/${driverData.id})**\n💼 **${role.name}** \`${driver.salary}${currency} /km\`${driver.canceled.amount > 0? `\n❌ **Job Cancelations (25%)** \`-${formatNum(driver.canceled.cost.toFixed(0))}${currency} (${driver.canceled.amount})\``:''}\n💰 ***Check Amount*** \`${formatNum(driver.revenue.toFixed(0))}${currency}\`\n🚛 \`${formatNum(driver.distance.toFixed(0))}km\``);
+      }
     }
 
     let statValues = {}
