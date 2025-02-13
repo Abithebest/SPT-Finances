@@ -119,8 +119,8 @@ module.exports = {
         statistics.cancelationCost += jobData.income;
       }
 
-      if(!driverData[driver.id]) {
-        let data = { driver, salary: 3 + driver.role.additional_member_salary, canceled: { amount: 0, cost: 0 } }
+      if(!driverData[driver.id] && jobData.status == 'completed') {
+        let data = { driver, salary: 3 + driver.role.additional_member_salary }
         if(jobData.status == 'completed') {
           data.revenue = (3 + driver.role.additional_member_salary) * jobData.driven_distance_km;
           data.distance = jobData.driven_distance_km;
