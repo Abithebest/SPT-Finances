@@ -79,7 +79,9 @@ module.exports = {
       "realMileRevenue": 0,
       "hardcorePoints": 0,
       "hardcoreJobs": 0,
-      "raceMiles": 0
+      "raceMiles": 0,
+      "cancelationCost": 0,
+      "cancelationAmount": 0
     }
     let driverData = new Object()
     let rankings = companyData.Finances || new Object();
@@ -112,6 +114,9 @@ module.exports = {
         }
 
         statistics.driverSalaries += (3 + driver.role.additional_member_salary) * jobData.driven_distance_km;
+      } else {
+        statistics.cancelationAmount++;
+        statistics.cancelationCost += jobData.income;
       }
 
       if(!driverData[driver.id]) {
@@ -119,10 +124,6 @@ module.exports = {
         if(jobData.status == 'completed') {
           data.revenue = (3 + driver.role.additional_member_salary) * jobData.driven_distance_km;
           data.distance = jobData.driven_distance_km;
-        } else if(jobData.status == 'canceled') {
-          data.revenue = jobData.income * .25;
-          data.distance = 0;
-          data.canceled = { amount: 1, cost: jobData.income * -.25 };
         }
 
         driverData[driver.id] = data;
@@ -130,10 +131,6 @@ module.exports = {
         if(jobData.status == 'completed') {
           driverData[driver.id].revenue += (3 + driver.role.additional_member_salary) * jobData.driven_distance_km;
           driverData[driver.id].distance += jobData.driven_distance_km;
-        } else if(jobData.status == 'canceled') {
-          driverData[driver.id].revenue -= jobData.income * -.25;
-          driverData[driver.id].canceled.amount++;
-          driverData[driver.id].canceled.cost += jobData.income * -.25;
         }
       }
     })
@@ -153,7 +150,7 @@ module.exports = {
       let driverData = companyDrivers[driverId];
       let role = getRole(driverData.role)
       if(!isNaN(driver.revenue)) {
-        formattedMembers.push(`🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🤵 **[${driverData.name} ${role.emojis}](https://hub.truckyapp.com/user/${driverData.id})**\n💼 **${role.name}** \`${driver.salary}${currency} /km\`${driver.canceled.amount > 0? `\n❌ **Job Cancelations (25%)** \`-${formatNum(driver.canceled.cost.toFixed(0))}${currency} (${driver.canceled.amount})\``:''}\n💰 ***Check Amount*** \`${formatNum(driver.revenue.toFixed(0))}${currency}\`\n🚛 \`${formatNum(driver.distance.toFixed(0))}km\``);
+        formattedMembers.push(`🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🤵 **[${driverData.name} ${role.emojis}](https://hub.truckyapp.com/user/${driverData.id})**\n💼 **${role.name}** \`${driver.salary}${currency} /km\`\n💰 ***Check Amount*** \`${formatNum(driver.revenue.toFixed(0))}${currency}\`\n🚛 \`${formatNum(driver.distance.toFixed(0))}km\``);
       }
     }
 
@@ -193,6 +190,9 @@ module.exports = {
         case 'raceMiles':
           statValues['raceMiles'] = `🏁 **Race Miles** \`${formatNum(statistics.raceMiles.toFixed(0))}km\` ${compare(rankings.raceMiles || 0, statistics.raceMiles)}`;
           break;
+        case 'cancelationCost':
+          statValues['cancelations'] = `❌ **Cancelation Penalties** \`${formatNum(statistics.cancelationCost.toFixed(0))}${currency} (${formatNum(statistics.cancelationAmount.toFixed(0))} Jobs)\`  ${compare(rankings.cancelationCost || 0, statistics.cancelationCost)}`;
+          break;
       }
     })
 
@@ -220,7 +220,7 @@ module.exports = {
     let CompanyEmbed = new EmbedBuilder()
       .setTitle('🏢 Company Weekly Statistics')
       .setDescription(
-        `***Base Salary is 3 T¢ per km +Rank Bonus  +Achievement Bonus***\n\n${statValues['realMileIncome']}\n${statValues['totalDamages']}\n${statValues['totalFines']}\n${statValues['totalRentals']}\n${statValues['fuelUsed']}\n${statValues['realMileRevenue']}\n${statValues['salaries']}\n${statValues['profits']}\n${statValues['raceMiles']}\n${statValues['hardcorePoints']}`
+        `***Base Salary is 3 T¢ per km +Rank Bonus  +Achievement Bonus***\n\n${statValues['realMileIncome']}\n${statValues['totalDamages']}\n${statValues['totalFines']}\n${statValues['totalRentals']}\n${statValues['fuelUsed']}\n${statValues['realMileRevenue']}\n${statValues['salaries']}\n${statValues['cancelations']}\n${statValues['profits']}\n${statValues['raceMiles']}\n${statValues['hardcorePoints']}`
       )
       .setColor('Random')
 

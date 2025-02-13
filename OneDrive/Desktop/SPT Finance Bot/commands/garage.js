@@ -106,7 +106,7 @@ module.exports = {
 		let [mcCode, mechanics] = await request(`company/9559/garage/${garageId}/mechanics`, 'GET')
 		let [vhCode, vehicles] = await request(`company/9559/garage/${garageId}/vehicles`, 'GET')
 		let [drCode, companyDrivers] = await request(`company/9559/members?perPage=9999`, 'GET')
-		let [jobCode, jobs] = await request(`company/9559/jobs?perPage=9999&dateFrom=${dateFromFormatted}&dateTo=${dateToFormatted}`, 'GET')
+		let [jobCode, jobs] = await request(`company/9559/jobs?perPage=9999&dateFrom=${dateFromFormatted}&dateTo=${dateToFormatted}&status=completed`, 'GET')
 		let drivers = new Object()
 
 		if(mtCode == 200) maintenance = JSON.parse(maintenance).data;
@@ -142,15 +142,9 @@ module.exports = {
 						})
 					}
 
-					if(job.status == 'completed') {
-						salary = job.driven_distance_km * driverSalary;
-					} else if(job.status == 'canceled') {
-						salary = job.income * .25;
-					}
-
 					if(drivers[driverId]) {
 						if(drivers[driverId].salary) {
-							drivers[driverId].salary += salary;
+							drivers[driverId].salary += job.driven_distance_km * driverSalary;
 							drivers[driverId].fuel.cost += job.fuel_cost;
 							drivers[driverId].fuel.used += job.fuel_used;
 							drivers[driverId].truck.damage += job.damage_cost;
@@ -158,7 +152,7 @@ module.exports = {
 							drivers[driverId].fineCost += finesCost;
 						}
 					} else {
-						drivers[driverId] = { driver, salary, fineCost: finesCost, fuel: { cost: job.fuel_cost, used: job.fuel_used }, truck: { damage: job.damage_cost, rentals: job.rent_cost_total }, expenses: [] };
+						drivers[driverId] = { driver, salary: job.driven_distance_km * driverSalary, fineCost: finesCost, fuel: { cost: job.fuel_cost, used: job.fuel_used }, truck: { damage: job.damage_cost, rentals: job.rent_cost_total }, expenses: [] };
 					}
 				}
 			}
