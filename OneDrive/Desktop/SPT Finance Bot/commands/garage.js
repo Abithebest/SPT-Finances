@@ -187,6 +187,7 @@ module.exports = {
     })
     let vhInDate = vehicles.filter((tData) => {
 			if(tData.deleted_at) return false;
+			if(!tData.driver) return false;
       let date = new Date(tData.created_at)
 			let driver = tData.driver;
 
