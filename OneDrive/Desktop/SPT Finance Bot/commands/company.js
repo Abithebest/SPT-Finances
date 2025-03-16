@@ -56,10 +56,12 @@ module.exports = {
 		let [drCode, companyDrivers] = await request(`company/9559/members?perPage=9999`, 'GET')
 		let [jobCode, jobs] = await request(`company/9559/jobs?perPage=9999&dateFrom=${dateFromFormatted}&dateTo=${dateToFormatted}`, 'GET')
     //let [vtlCode, vtlJobs] = await request(`https://api.vtlog.net/v1/vtc/5636/jobs?limit=9999`, 'GET')
+    JSON.parse(jobs).data.forEach((a) => {if(a.driver.name.includes('Cledus')) console.log(a)})
 
 		if(jobCode == 200) jobs = JSON.parse(jobs).data.filter(jData => isDateInRange(jData.updated_at, dateFrom, dateTo))
 		if(drCode == 200) companyDrivers = getObject(JSON.parse(companyDrivers).data, 'id');
     //if(vtlCode == 200) vtlJobs = JSON.parse(vtlJobs).data;
+    jobs.forEach((a) => {if(a.driver.name.includes('Cledus')) console.log("}", a)})
 
     let companyData = await db.collection('Companies').findOne({ ServerId: interaction.guildId })
     if(!companyData) {
