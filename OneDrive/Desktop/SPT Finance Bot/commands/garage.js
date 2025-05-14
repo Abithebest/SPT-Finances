@@ -158,6 +158,7 @@ module.exports = {
 			}
 		}
 
+		let replacementCosts = 0;
 		let mtInDate = maintenance.filter((mData) => {
       let date = new Date(mData.created_at)
 			if(!mData || !mData.vehicle) return;
@@ -180,6 +181,10 @@ module.exports = {
 
 				if(specialGarages.includes(garageId)) {
 					earnings += mData.price;
+				}
+
+				if(mData.type == 'replace_parts') {
+					replacementCosts += mData.price;
 				}
 
         return true;
@@ -243,7 +248,7 @@ module.exports = {
 			}
 		}
 
-		let description = `🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🏪 **${garage.city.name} Office Expenses ${formattedWeek}**${gFuelCost > 0 ? `\n⠀⠀⛽ Fuel Cost \`-${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))} gl.)\``: ''}${truckDamage > 0 ? `\n⠀⠀💥 Truck Damage Expenses: \`-${formatNum(truckDamage.toFixed(0))}${currency}\``:''}${truckRentals > 0 ? `\n⠀⠀🛻 Truck Rentals: \`-${formatNum(truckRentals.toFixed(0))}${currency}\``:''}${fineCosts > 0 ? `\n⠀⠀🎫 Fines: \`-${formatNum(fineCosts.toFixed(0))}${currency}\``:''}`;
+		let description = `🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🏪 **${garage.city.name} Office Expenses ${formattedWeek}**${gFuelCost > 0 ? `\n⠀⠀⛽ Fuel Cost \`-${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))} gl.)\``: ''}${replacementCosts > 0 ? `\n⠀⠀🛠️ Part Replacement Costs: \`-${formatNum(replacementCosts.toFixed(0))}${currency}\``:''}${truckDamage > 0 ? `\n⠀⠀💥 Truck Damage Expenses: \`-${formatNum(truckDamage.toFixed(0))}${currency}\``:''}${truckRentals > 0 ? `\n⠀⠀🛻 Truck Rentals: \`-${formatNum(truckRentals.toFixed(0))}${currency}\``:''}${fineCosts > 0 ? `\n⠀⠀🎫 Fines: \`-${formatNum(fineCosts.toFixed(0))}${currency}\``:''}`;
 		let formattedDrivers = new Array()
 		gdriverIds.map(driverId => {
 			if(!drivers[driverId]) return;
@@ -271,7 +276,7 @@ module.exports = {
 					const paidOff = driverExpenseCost<salary?'💵':'💳';
 					formattedExpenses.push(`⠀⠀⠀⠀🚛 #${data.id} ${truckModel} \`-${formatNum((data.price * .50).toFixed(0))}${currency}\` ${!specialGarages.includes(garageId)?paidOff:''}`)
 				}
-				if(eData.type == 'maintenance') {
+				if(eData.type == 'maintenance' && data.type != 'replace_parts') {
 					if(!specialGarages.includes(garageId)) {
 						earnings -= data.price;
 					}
