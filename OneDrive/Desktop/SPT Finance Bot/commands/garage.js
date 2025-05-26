@@ -102,11 +102,11 @@ module.exports = {
 		let dateToDay = dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate();
 		let dateToFormatted = `${dateTo.getFullYear()}-${dateToMonth<10?'0':''}${dateToMonth}-${dateToDay}T23:59:59Z`;
 
-		let [mtCode, maintenance] = await request('company/9559/maintenances?perPage=99999', 'GET')
-		let [mcCode, mechanics] = await request(`company/9559/garage/${garageId}/mechanics`, 'GET')
-		let [vhCode, vehicles] = await request(`company/9559/garage/${garageId}/vehicles`, 'GET')
-		let [drCode, companyDrivers] = await request(`company/9559/members?perPage=9999`, 'GET')
-		let [jobCode, jobs] = await request(`company/9559/jobs?perPage=9999&dateFrom=${dateFromFormatted}&dateTo=${dateToFormatted}&status=completed`, 'GET')
+		let [mtCode, maintenance] = await request('v1/company/9559/maintenances?perPage=99999', 'GET')
+		let [mcCode, mechanics] = await request(`v1/company/9559/garage/${garageId}/mechanics`, 'GET')
+		let [vhCode, vehicles] = await request(`v1/company/9559/garage/${garageId}/vehicles`, 'GET')
+		let [drCode, companyDrivers] = await request(`v1/company/9559/members?perPage=9999`, 'GET')
+		let [jobCode, jobs] = await request(`v1/company/9559/jobs?perPage=9999&dateFrom=${dateFromFormatted}&dateTo=${dateToFormatted}&status=completed`, 'GET')
 		let drivers = new Object()
 
 		if(mtCode == 200) maintenance = JSON.parse(maintenance).data;

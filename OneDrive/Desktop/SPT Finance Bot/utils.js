@@ -5,6 +5,7 @@ const MongoModule = require("mongodb"); // Companies: companyid, serverid, finan
 const MongoClient = MongoModule.MongoClient;
 const client = new MongoClient(process.env['mongoToken']);
 
+let currentDate = new Date()
 let currency = 'T¢';
 let verifiedUsers = ['748910218846666894', '486806760288550933']
 let Months = [
@@ -80,13 +81,15 @@ function splitArray(originalArray, splitSize = 10) {
 let compare = (num1, num2) => {
 	if(num1 < num2) {
 		return '<:SPTStonksUP:1297626694785568768>';
-	} else {
+	} else if (num1 > num2) {
 		return '<:SPTUnstonksDown:1297627048919044116>';
-	}
+	} else {
+    return '`/`'
+  }
 }
 
 async function request(url, method = 'GET', body) {
-  let req = await axios[method.toLowerCase()](url.startsWith('https')?url:`https://e.truckyapp.com/api/v1/${url}`, {
+  let req = await axios[method.toLowerCase()](url.startsWith('https')?url:`https://e.truckyapp.com/api/${url}`, {
     method,
     headers: {
       "User-Agent": "Sonny Pruitt Trucking",
@@ -112,7 +115,8 @@ module.exports = {
 	getRole,
 	compare,
   request,
-  currency
+  currency,
+  currentDate
 }
 
 async function defineCommand(c) {

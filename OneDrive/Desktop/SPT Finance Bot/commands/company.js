@@ -53,8 +53,8 @@ module.exports = {
 		let dateToDay = dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate();
 		let dateToFormatted = `${dateTo.getFullYear()}-${dateToMonth<10?'0':''}${dateToMonth}-${dateToDay}T23:59:59Z`;
 
-		let [drCode, companyDrivers] = await request(`company/9559/members?perPage=9999`, 'GET')
-		let [jobCode, jobs] = await request(`company/9559/jobs?perPage=9999&dateFrom=${dateFromFormatted}&dateTo=${dateToFormatted}`, 'GET')
+		let [drCode, companyDrivers] = await request(`v1/company/9559/members?perPage=9999`, 'GET')
+		let [jobCode, jobs] = await request(`v1/company/9559/jobs?perPage=9999&dateFrom=${dateFromFormatted}&dateTo=${dateToFormatted}`, 'GET')
     //let [vtlCode, vtlJobs] = await request(`https://api.vtlog.net/v1/vtc/5636/jobs?limit=9999`, 'GET')
     JSON.parse(jobs).data.forEach((a) => {if(a.driver.name.includes('Cledus')) console.log(a)})
 
