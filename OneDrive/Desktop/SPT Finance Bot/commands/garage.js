@@ -8,13 +8,8 @@ let specialGarages = [
   22263
 ];
 
-/*
-TODO:
-* Next Maintenance - 1000 km or less before maintenance 
-*/
-
 async function getGarage(data) {
-	let [gCode, companyGarages] = await request('company/9559/garages', 'GET')
+	let [gCode, companyGarages] = await request('v1/company/9559/garages', 'GET')
 
 	if(gCode == 200) {
 		companyGarages = JSON.parse(companyGarages)
