@@ -74,8 +74,9 @@ module.exports = {
     }
 
     let driverSetup = [];
-    userData.sort((a, b) => b.driven_distance - a.driven_distance).forEach(data => {
-      driverSetup.push(`**${data.name}**\n\`${formatNum(data.driven_distance)}mi.\` | \`${formatNum(data.cargo_mass_t)}t.\` | \`${formatNum(data.revenue)}${currency}\` | \`${formatNum(data.jobs)}\` | \`${formatNum(data.total_earned)}${currency}\``)
+    userData.sort((a, b) => (b.driven_distance_km / 1.609) - (a.driven_distance_km / 1.609)).forEach(data => {
+      let driverDistance = data.driven_distance_km / 1.609;
+      driverSetup.push(`**${data.name}**\n\`${formatNum(driverDistance.toFixed(0))}mi.\` | \`${formatNum(data.cargo_mass_t)}t.\` | \`${formatNum(data.revenue)}${currency}\` | \`${formatNum(data.jobs)}\` | \`${formatNum(data.total_earned)}${currency}\``)
 
       if(driversRanked.revenue[0] < data.revenue) {
         driversRanked.revenue = [data.revenue, data.name]
@@ -83,8 +84,8 @@ module.exports = {
       if(driversRanked.mass[0] < data.cargo_mass_t) {
         driversRanked.mass = [data.cargo_mass_t, data.name]
       }
-      if(driversRanked.distance[0] < data.driven_distance) {
-        driversRanked.distance = [data.driven_distance, data.name]
+      if(driversRanked.distance[0] < driverDistance) {
+        driversRanked.distance = [driverDistance, data.name]
       }
     })
 
@@ -93,7 +94,7 @@ module.exports = {
     .setTitle(`📊 Trucky Company ${uppercase(monthNames[month-1])} ${(month == 1?currentDate.getFullYear() - 1:currentDate.getFullYear()).toString().replace('20', '\'')}`)
     .addFields(
       {name: ':flag_us: ATS', value: `⠀⠀🛻 **Real Ranking**: \`#${formatNum(companyStats.ats.leaderbords_position_real_miles)}\` ${compare(compRanks.ats.real || 0, companyStats.ats.leaderbords_position_real_miles)}\n⠀⠀🏎️ **Race Ranking**: \`#${formatNum(companyStats.ats.leaderbords_position_race_miles)}\` ${compare(compRanks.ats.race || 0, companyStats.ats.leaderbords_position_race_miles)}\n⠀⠀🚛 **Hardcore Ranking**: \`#${formatNum(rankings.ats.position)}\` ***(${formatNum(rankings.ats.points)}HP)*** ${compare(compRanks.ats.hardcore || 0, rankings.ats.position)}`},
-      {name: ':flag_gb: ETS', value: `⠀⠀🛻 **Real Ranking**: \`#${formatNum(companyStats.ets2.leaderbords_position_real_miles)}\` ${compare(compRanks.ets.real || 0, companyStats.ets2.leaderbords_position_real_miles)}\n⠀⠀🏎️ **Race Ranking**: \`#${formatNum(companyStats.ets2.leaderbords_position_race_miles)}\` ${compare(compRanks.ets.race || 0, companyStats.ets2.leaderbords_position_race_miles)}\n⠀⠀🚛 **Hardcore Ranking**: \`#${formatNum(rankings.ets.position)}\` ***(${formatNum(rankings.ets.points)}HP)*** ${compare(compRanks.ets.hardcore || 0, rankings.ets.position)}`}
+      {name: ':flag_gb: ETS', value: `⠀⠀🛻 **Real Ranking**: \`#${formatNum(companyStats.ets2.leaderbords_position_real_miles)}\` ${compare(compRanks.ets.real || 0, companyStats.ets2.leaderbords_position_real_miles)}\n⠀⠀🏎️ **Race Ranking**: \`${companyStats.ets2.leaderbords_position_race_miles > 0?`#${formatNum(companyStats.ets2.leaderbords_position_race_miles)}`:'N/A'}\` ${compare(compRanks.ets.race || 0, companyStats.ets2.leaderbords_position_race_miles)}\n⠀⠀🚛 **Hardcore Ranking**: \`#${formatNum(rankings.ets.position)}\` ***(${formatNum(rankings.ets.points)}HP)*** ${compare(compRanks.ets.hardcore || 0, rankings.ets.position)}`}
     )
     .setColor('Green')
 
@@ -104,13 +105,13 @@ module.exports = {
 
     let companyHighlights = new EmbedBuilder()
     .setTitle(`💡 Company Highlights`)
-    .setDescription(`:flag_us: **ATS Total Miles**: \`${formatNum((companyStats.ats.total_km / 1.609).toFixed(0))}mi.\`\n:flag_gb: **ETS Total Kilometers**: \`${formatNum(companyStats.ets2.total_km)}km.\`\n💰 **Most Earned Revenue**: \`${formatNum(driversRanked.revenue[0])}${currency}\` *(${driversRanked.revenue[1]})*\n🚚 **Most Transported**: \`${formatNum(driversRanked.mass[0])}t.\` *(${driversRanked.mass[1]})*\n🚛 **Most Distance**: \`${formatNum(driversRanked.distance[0])}mi.\` *(${driversRanked.distance[1]})*`)
+    .setDescription(`:flag_us: **ATS Total Miles**: \`${formatNum((companyStats.ats.total_km / 1.609).toFixed(0))}mi.\`\n:flag_gb: **ETS Total Kilometers**: \`${formatNum(companyStats.ets2.total_km)}km.\`\n💰 **Most Earned Revenue**: \`${formatNum(driversRanked.revenue[0])}${currency}\` *(${driversRanked.revenue[1]})*\n🚚 **Most Transported**: \`${formatNum(driversRanked.mass[0])}t.\` *(${driversRanked.mass[1]})*\n🚛 **Most Distance**: \`${formatNum(driversRanked.distance[0].toFixed(0))}mi.\` *(${driversRanked.distance[1]})*`)
     .setFooter({ text: 'Company Highlights are for ALL Mile Types' })
     .setColor('Green')
 
     let companyDrivers = new EmbedBuilder()
     .setTitle('👷‍♂️ Trucky Driver Stats')
-    .setDescription(driverSetup.join('\n\n'))
+    .setDescription('`Distance | Weight | Revenue | Jobs | Earnings`\n\n' + driverSetup.join('\n\n'))
     .setColor('Green')
 
     await db.collection('Companies').updateOne({ ServerId: interaction.guildId }, {
