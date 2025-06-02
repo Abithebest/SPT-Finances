@@ -56,12 +56,10 @@ module.exports = {
 		let [drCode, companyDrivers] = await request(`v1/company/9559/members?perPage=9999`, 'GET')
 		let [jobCode, jobs] = await request(`v1/company/9559/jobs?perPage=9999&dateFrom=${dateFromFormatted}&dateTo=${dateToFormatted}`, 'GET')
     //let [vtlCode, vtlJobs] = await request(`https://api.vtlog.net/v1/vtc/5636/jobs?limit=9999`, 'GET')
-    JSON.parse(jobs).data.forEach((a) => {if(a.driver.name.includes('Cledus')) console.log(a)})
 
 		if(jobCode == 200) jobs = JSON.parse(jobs).data.filter(jData => isDateInRange(jData.updated_at, dateFrom, dateTo))
 		if(drCode == 200) companyDrivers = getObject(JSON.parse(companyDrivers).data, 'id');
     //if(vtlCode == 200) vtlJobs = JSON.parse(vtlJobs).data;
-    jobs.forEach((a) => {if(a.driver.name.includes('Cledus')) console.log("}", a)})
 
     let companyData = await db.collection('Companies').findOne({ ServerId: interaction.guildId })
     if(!companyData) {
@@ -118,7 +116,7 @@ module.exports = {
         statistics.driverSalaries += (3 + driver.role.additional_member_salary) * jobData.driven_distance_km;
       } else {
         statistics.cancelationAmount++;
-        statistics.cancelationCost += jobData.income;
+        statistics.cancelationCost += (jobData.income * -1);
       }
 
       if(!driverData[driver.id] && jobData.status == 'completed') {
@@ -193,7 +191,7 @@ module.exports = {
           statValues['raceMiles'] = `🏁 **Race Miles** \`${formatNum(statistics.raceMiles.toFixed(0))}km\` ${compare(rankings.raceMiles || 0, statistics.raceMiles)}`;
           break;
         case 'cancelationCost':
-          statValues['cancelations'] = `❌ **Cancelation Penalties** \`${formatNum(statistics.cancelationCost.toFixed(0))}${currency} (${formatNum(statistics.cancelationAmount.toFixed(0))} Jobs)\`  ${compare(rankings.cancelationCost || 0, statistics.cancelationCost)}`;
+          statValues['cancelations'] = `❌ **Cancelation Penalties** \`-${formatNum(statistics.cancelationCost.toFixed(0))}${currency} (${formatNum(statistics.cancelationAmount.toFixed(0))} Jobs)\`  ${compare(rankings.cancelationCost || 0, statistics.cancelationCost)}`;
           break;
       }
     })
