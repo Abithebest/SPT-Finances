@@ -68,7 +68,6 @@ module.exports = {
     }
 
     let statistics = {
-      "garageExpenses": 0,
       "driverSalaries": 0,
       "realMileIncome": 0,
       "totalDamages": 0,
@@ -177,9 +176,6 @@ module.exports = {
           return;
         case 'hardcorePoints':
           statValues[sData] = `🎰 **Hardcore Points** \`${formatNum(statistics['hardcorePoints'].toFixed(0))} (${formatNum(statistics.hardcoreJobs)} Jobs)\` ${compare(rankings.hardcorePoints || 0, statistics.hardcorePoints)}`;
-          return;
-        case 'garageExpenses':
-          statValues[sData] = `🏗️ **Total Garage Expenses** \`-${formatNum(statistics.garageExpenses.toFixed(0))}${currency}\` ${compare(rankings.garageExpenses || 0, statistics.garageExpenses)}`;
           return;
         case 'hardcoreJobs':
           statValues['profits'] = `🏦 **Estimated Profits** \`+${formatNum((statistics.realMileRevenue - (statistics.driverSalaries + statistics.garageExpenses)).toFixed(0))}${currency}\` ${compare(rankings.realMileRevenue - (rankings.driverSalaries + rankings.garageExpenses), (statistics.realMileRevenue - (statistics.driverSalaries + statistics.garageExpenses)))}`;
