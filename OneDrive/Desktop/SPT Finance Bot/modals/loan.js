@@ -1,0 +1,35 @@
+let { db } = require("../utils.js")
+
+module.exports = async function({interaction}) {
+  let title = interaction.fields.getTextInputValue("titleInput")
+  let amount = parseInt(interaction.fields.getTextInputValue("amountInput"))
+  let created = (new Date()).getTime()
+
+  if(isNaN(amount)) {
+    interaction.reply({
+      ephemeral: true,
+      content: 'Loan amount has to be a number.'
+    })
+
+    return;
+  }
+
+  let companyData = await db.collection('Companies').findOne({ ServerId: interaction.guildId })
+  if(!companyData) {
+    interaction.editReply('Register your company before using this command.')
+    return;
+  }
+
+  let loanData = await db.collection('Loans').insertOne({
+    ServerId: interaction.guildId,
+    Amount: amount,
+    Title: title,
+    Created: created,
+    LastPayment: created
+  })
+
+  interaction.reply({
+    ephemeral: true,
+    content: 'Loan has been created!'
+  })
+}

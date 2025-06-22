@@ -4,6 +4,7 @@ const express = require('express')
 const handleCommand = require('./handlers/handleCommand.js')
 const handleButton = require('./handlers/handleButton.js')
 const handleSelect = require('./handlers/handleSelect.js')
+const handleModal = require('./handlers/handleModal.js')
 
 const utils = require('./utils.js')
 
