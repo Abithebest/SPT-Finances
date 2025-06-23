@@ -178,7 +178,7 @@ module.exports = {
           statValues[sData] = `🎰 **Hardcore Points** \`${formatNum(statistics['hardcorePoints'].toFixed(0))} (${formatNum(statistics.hardcoreJobs)} Jobs)\` ${compare(rankings.hardcorePoints || 0, statistics.hardcorePoints)}`;
           return;
         case 'hardcoreJobs':
-          statValues['profits'] = `🏦 **Estimated Profits** \`+${formatNum((statistics.realMileRevenue - (statistics.driverSalaries + statistics.garageExpenses)).toFixed(0))}${currency}\` ${compare(rankings.realMileRevenue - (rankings.driverSalaries + rankings.garageExpenses), (statistics.realMileRevenue - (statistics.driverSalaries + statistics.garageExpenses)))}`;
+          statValues['profits'] = `🏦 **Estimated Profits** \`+${formatNum((statistics.realMileRevenue - statistics.driverSalaries).toFixed(0))}${currency}\` ${compare(rankings.realMileRevenue - rankings.driverSalaries, (statistics.realMileRevenue - statistics.driverSalaries))}`;
           return;
         case 'driverSalaries':
           statValues['salaries'] = `🤵 **Driver Salaries** \`-${formatNum(statistics.driverSalaries.toFixed(0))}${currency}\` ${compare(rankings.driverSalaries || 0, statistics.driverSalaries)}`;
