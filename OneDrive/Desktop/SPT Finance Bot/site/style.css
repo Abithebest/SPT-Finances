@@ -76,7 +76,20 @@ button {
   display:flex;
   margin-left:auto;
 }
+#ProfileHolder {
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
 #ProfileImg {
-  width: 10px;
-  height: 10px;
+  border-radius:100px;
+  width: 30px;
+  height: 30px;
+  object-fit:cover;
+  border:solid;
+  border-color:#ca807020;
+}
+#ProfileName {
+  height:fit-content;
+  width:fit-content;
 }

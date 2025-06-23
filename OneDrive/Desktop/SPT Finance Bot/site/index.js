@@ -442,4 +442,6 @@ window.addEventListener(
 );
 if (window.location.hash != '') {
   setPage(window.location.hash.substring(1));
+} else {
+  setPage('home');
 }

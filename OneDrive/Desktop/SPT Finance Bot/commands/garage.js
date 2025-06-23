@@ -125,9 +125,12 @@ module.exports = {
 				let driverSalary = 3 + companyDrivers[driverId].role.additional_member_salary;
 				let driverJobs = jobs.filter(jData => jData.driver.id == driverId)
 
+				if(driverJobs.length == 0) {
+					drivers[driverId] = { driver, salary: 0, fineCost: 0, fuel: { cost: 0, used: 0 }, truck: { damage: 0, rentals: 0 }, expenses: [] };
+				}
+
 				for(let i2=0;i2<driverJobs.length;i2++) {
 					let job = driverJobs[i2];
-					let salary = 0;
 
 					let finesCost = 0;
 					let fines = JSON.parse(job.fines_details) || [];
@@ -138,7 +141,7 @@ module.exports = {
 					}
 
 					if(drivers[driverId]) {
-						if(drivers[driverId].salary) {
+						if(drivers[driverId].salary != undefined) {
 							drivers[driverId].salary += job.driven_distance_km * driverSalary;
 							drivers[driverId].fuel.cost += job.fuel_cost;
 							drivers[driverId].fuel.used += job.fuel_used;
