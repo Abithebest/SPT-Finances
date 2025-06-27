@@ -46,7 +46,7 @@ button {
 #Header {
   background: var(--bgA10);
   width:calc(100% - 20px);
-  height:2rem;
+  height:32px;
   padding:10px;
   display:flex;
   align-items:center;
@@ -54,6 +54,7 @@ button {
 }
 #PageHolder {
   padding: 10px;
+  height:calc(100% - 82px);
 }
 
 .HeaderButton {
@@ -92,4 +93,15 @@ button {
 #ProfileName {
   height:fit-content;
   width:fit-content;
+}
+
+#dbSidebar {
+  display:flex;
+  flex-direction: column;
+  background:var(--bgA10);
+  padding:6px;
+  border-radius:20px;
+  width:15rem;
+  height:100%;
+  gap:5px;
 }

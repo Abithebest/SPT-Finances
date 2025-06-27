@@ -24,6 +24,8 @@ module.exports = {
       return;
     }
 
+    await interaction.deferReply()
+
     let companyDB = await db.collection('Companies').findOne({ ServerId: interaction.guildId })
     if(!companyDB) {
       interaction.editReply('Register your company before using this command.')
@@ -35,12 +37,12 @@ module.exports = {
     let formattedLoans = loans.map(loanData => {
       return new StringSelectMenuOptionBuilder()
         .setLabel(loanData.Title)
-        .setDescription(`Amount due ... ${formatNum(loanData.Amount)}${currency}`)
+        .setDescription(`Amount due ... ${formatNum(loanData.Amount.Current)}${currency}`)
         .setValue(loanData._id.toString())
     })
 
     if(formattedLoans.length == 0) {
-      interaction.reply({
+      interaction.editReply({
         ephemeral: true,
         content: 'No loans are currently active.'
       })
@@ -48,14 +50,14 @@ module.exports = {
     }
 
     const selectmenu = new StringSelectMenuBuilder()
-			.setCustomId(`loanpick;${optionData(params[0]) || 0}`)
+			.setCustomId(`loanpick;${optionData(params[0]) || -1}`)
 			.setPlaceholder('Select a loan...')
 			.addOptions(formattedLoans);
 
     const row = new ActionRowBuilder()
 			.addComponents(selectmenu);
 
-    interaction.reply({
+    interaction.editReply({
       components: [row]
     })
   }

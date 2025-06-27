@@ -17,7 +17,7 @@ module.exports = {
 
     const titleInput = new TextInputBuilder()
       .setCustomId('titleInput')
-      .setMaxLength(20)
+      .setMaxLength(100)
       .setRequired(true)
       .setLabel('Loan Title')
       .setStyle(TextInputStyle.Short);

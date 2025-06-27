@@ -11,23 +11,25 @@ module.exports = async function({interaction}) {
 		return;
 	}
 
+	interaction.deferUpdate()
+
 	let pickedId = interaction.values[0];
-	let loanUpdate = parseInt(interaction.customId.split(';')[1]) || 0;
+	let loanUpdate = parseInt(interaction.customId.split(';')[1]);
 	let loan = await db.collection('Loans').findOne({ _id: new ObjectId(pickedId) })
 
 	let created = new Date(loan.Created)
 
 	let fields = []
 	if(loanUpdate > 0) {
-		loan.Amount -= loanUpdate;
-		if(loan.Amount < 0) {
-			loan.Amount = 0;
+		loan.Amount.Current -= loanUpdate;
+		if(loan.Amount.Current < 0) {
+			loan.Amount.Current = 0;
 		}
 		loan.LastPayment = new Date().getTime();
 
 		fields = [
 			{name: 'Loan Payment', value: `💰 \`+${formatNum(loanUpdate)}${currency}\``},
-			{name: 'Loan Balance', value: `💵 \`-${formatNum(loan.Amount)}${currency}\``},
+			{name: 'Loan Balance', value: `💵 \`-${formatNum(loan.Amount.Current)}${currency}\``},
 			{name: 'Last Payment', value: `⏰ <t:${(loan.LastPayment / 1000).toFixed(0)}:R>`}
 		]
 
@@ -39,13 +41,17 @@ module.exports = async function({interaction}) {
 		})
 	} else {
 		fields = [
-			{name: 'Loan Balance', value: `💵 \`-${formatNum(loan.Amount)}${currency}\``},
+			{name: 'Loan Balance', value: `💵 \`-${formatNum(loan.Amount.Current)}${currency}\``},
 			{name: 'Last Payment', value: `⏰ <t:${(loan.LastPayment / 1000).toFixed(0)}:R>`}
 		]
+
+		if(loanUpdate == 0) {
+			fields.unshift({name: 'Loan Payment', value: `*No Payment*`})
+		}
 	}
 	
 	let LoanShow = new EmbedBuilder()
-		.setTitle(loan.Title)
+		.setTitle(`${loan.Title} *${formatNum(loan.Amount.Original)}${currency}*`)
 		.setFields(fields)
 		.setFooter({ text: `Loan created ${created.getMonth()}/${created.getDate()}/${created.getFullYear()}` })
 		.setColor('Random')
@@ -58,7 +64,6 @@ module.exports = async function({interaction}) {
 	const row = new ActionRowBuilder()
 		.addComponents(loandelete);
 
-	interaction.deferUpdate()
 	interaction.message.edit({
 		embeds: [LoanShow],
 		components: [row]

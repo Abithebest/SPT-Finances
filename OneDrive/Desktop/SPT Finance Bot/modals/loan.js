@@ -5,8 +5,13 @@ module.exports = async function({interaction}) {
   let amount = parseInt(interaction.fields.getTextInputValue("amountInput"))
   let created = (new Date()).getTime()
 
+  interaction.reply({
+    ephemeral: true,
+    content: 'Waiting for response...'
+  })
+
   if(isNaN(amount)) {
-    interaction.reply({
+    interaction.editReply({
       ephemeral: true,
       content: 'Loan amount has to be a number.'
     })
@@ -22,13 +27,16 @@ module.exports = async function({interaction}) {
 
   let loanData = await db.collection('Loans').insertOne({
     ServerId: interaction.guildId,
-    Amount: amount,
+    Amount: {
+      Current: amount,
+      Original: amount
+    },
     Title: title,
     Created: created,
     LastPayment: created
   })
 
-  interaction.reply({
+  interaction.editReply({
     ephemeral: true,
     content: 'Loan has been created!'
   })

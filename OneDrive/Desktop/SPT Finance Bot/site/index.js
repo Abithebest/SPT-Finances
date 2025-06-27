@@ -165,143 +165,17 @@ function modifyParams(key, value) {
   window.history.pushState({
   }, '', Url);
 }
-let epochOffset = 0;
-function getEpoch() {
-  return Date.now() + epochOffset;
-}
-let sentFirstReq = false;
 async function sendRequest(method, path, body, noFileType) {
-  if (account.banned == true && path != 'mod/appeal') {
-    return [0,
-    'Account Banned'];
+  if(!body instanceof FormData && method != "GET") {
+    body = JSON.stringify(body);
   }
-  let hadSentFirst = sentFirstReq;
-  sentFirstReq = true;
-  try {
-    let sendData = {
-      method: method,
-      headers: {
-        'cache': 'no-cache'
-      }
-    };
-    if (noFileType != true) {
-      sendData.headers['Content-Type'] = 'text/plain';
-    }
-    if (body != null) {
-      if (typeof body == 'object' && body instanceof FormData == false) {
-        body = JSON.stringify(body);
-      }
-      sendData.body = body;
-    }
-    let token = getLocalStore('token');
-    if (token != null) {
-      token = JSON.parse(token);
-      if (token.expires < Math.floor(getEpoch() / 1000)) {
-        token = await renewToken() ||
-        token;
-      }
-      let sendUserID = userID ||
-      getLocalStore('userID');
-      if (sendUserID != null) {
-        sendData.headers.auth = sendUserID + ';' + token.session;
-      }
-    }
-    let response = await fetch(config.server + path, sendData);
-    if (response.headers.has('date') == true) {
-      let serverTimeMillisGMT = new Date(response.headers.get('date')).getTime();
-      let localMillisUTC = new Date().getTime();
-      epochOffset = serverTimeMillisGMT - localMillisUTC;
-    }
-    switch (response.status) {
-      case 401:
-        await renewToken();
-        break;
-      case 429:
-        (await getModule('modal')) (
-          'Rate Limited',
-          await response.text(),
-          [
-            ['Okay',
-            'var(--grayColor)']
-          ]
-        );
-        break;
-      case 418:
-        account.banned = true;
-        let data = JSON.parse(await response.text());
-        (await getModule('modal')) (
-          'Account Banned',
-          `Oh no! It appears you have broken a Photop rule resulting in your account being banned.<br><br><b>Account:</b> ${ data.account }<br><b>Reason:</b> ${ data.reason }<br><b>Expires:</b> ${ (
-            data.expires == 'Permanent' ? 'Permanent' : formatFullDate(data.expires * 1000)
-          ) }${ (data.terminated == true ? '<br><b>Terminated:</b> Yes' : '') }${ !data.appealed ? `<br><div id="banAppealInput" contenteditable class="textArea" placeholder="Appeal your Ban"></div><button id="submitAppealButton">Submit</button>` : '' }`
-        );
-        let appealSend = findI('submitAppealButton');
-        if (appealSend != null) {
-          appealSend.addEventListener(
-            'click',
-            async function () {
-              let appealInput = findI('banAppealInput');
-              if (appealInput.textContent.length < 1) {
-                (await getModule('modal')) (
-                  'Write an Appeal',
-                  'You must write an appeal before submitting it.',
-                  [
-                    ['Okay',
-                    'var(--grayColor)']
-                  ]
-                );
-                return;
-              }
-              let[code] = await sendRequest(
-                'POST',
-                'mod/appeal',
-                {
-                  appeal: appealInput.textContent.substring(0, 250)
-                }
-              );
-              if (code == 200) {
-                appealInput.remove();
-                appealSend.remove();
-                (await getModule('modal')) (
-                  'Appeal Sent',
-                  'We\'ve recieved your appeal and will review it as soon as possible.',
-                  [
-                    ['Okay',
-                    'var(--grayColor)']
-                  ]
-                );
-              }
-            }
-          );
-        }
-        break;
-      default:
-        return [response.status,
-        await response.text()];
-    }
-    return [0,
-    'Request Refused'];
-  } catch (err) {
-    if (hadSentFirst == false) {
-      findI(
-        'backBlur' + (await getModule('modal')) (
-          'Error Reaching Server',
-          'Oh no! We encountered an error sending your request through the pipes of the internet. Please try again later.',
-          [
-            ['Retry',
-            'var(--themeColor)',
-            function () {
-              location.reload();
-            }
-            ]
-          ]
-        )
-      ).style.zIndex = 999999;
-    }
-    console.log('FETCH ERROR: ' + err);
-    return [0,
-    'Fetch Error'];
-  }
+
+  let request = await fetch(`http://localhost:3000/${path}`, {
+    body,
+    method
+  });
+
+  return [request.code, await request.text()];
 }
 function getObject(arr, field) {
   if (arr == null) {
