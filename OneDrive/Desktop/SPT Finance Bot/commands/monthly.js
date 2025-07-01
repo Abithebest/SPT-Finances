@@ -89,12 +89,44 @@ module.exports = {
       }
     })
 
+    let rankTrophies = (() => {
+      let trophies = {
+        realAts: '',
+        realEts: '',
+        raceAts: '',
+        raceEts: '',
+        hardcoreAts: '',
+        hardcoreEts: ''
+      }
+      if(companyStats.ets2.leaderbords_position_real_miles < 4) {
+        trophies.realEts = '🏆';
+      }
+      if(companyStats.ats.leaderbords_position_real_miles < 4) {
+        trophies.realAts = '🏆';
+      }
+      if(companyStats.ats.leaderbords_position_race_miles < 4) {
+        trophies.raceAts = '🏆';
+      }
+      if(companyStats.ets2.leaderbords_position_race_miles < 4) {
+        trophies.raceEts = '🏆';
+      }
+      if(rankings.ats.position < 4) {
+        trophies.hardcoreAts = '🏆';
+      }
+      if(rankings.ets.position < 4) {
+        trophies.hardcoreEts = '🏆';
+      }
+
+      return trophies;
+    })();
+    console.log(rankTrophies)
+
     // Message Setup
     let companyRankings = new EmbedBuilder()
     .setTitle(`📊 Trucky Company ${uppercase(monthNames[month-1])} ${(month == 1?currentDate.getFullYear() - 1:currentDate.getFullYear()).toString().replace('20', '\'')}`)
     .addFields(
-      {name: ':flag_us: ATS', value: `⠀⠀🛻 **Real Ranking**: \`#${formatNum(companyStats.ats.leaderbords_position_real_miles)}\` ${compare(compRanks.ats.real || 0, companyStats.ats.leaderbords_position_real_miles)}\n⠀⠀🏎️ **Race Ranking**: \`#${formatNum(companyStats.ats.leaderbords_position_race_miles)}\` ${compare(compRanks.ats.race || 0, companyStats.ats.leaderbords_position_race_miles)}\n⠀⠀🚛 **Hardcore Ranking**: \`#${formatNum(rankings.ats.position)}\` ***(${formatNum(rankings.ats.points)}HP)*** ${compare(compRanks.ats.hardcore || 0, rankings.ats.position)}`},
-      {name: ':flag_gb: ETS', value: `⠀⠀🛻 **Real Ranking**: \`#${formatNum(companyStats.ets2.leaderbords_position_real_miles)}\` ${compare(compRanks.ets.real || 0, companyStats.ets2.leaderbords_position_real_miles)}\n⠀⠀🏎️ **Race Ranking**: \`${companyStats.ets2.leaderbords_position_race_miles > 0?`#${formatNum(companyStats.ets2.leaderbords_position_race_miles)}`:'N/A'}\` ${compare(compRanks.ets.race || 0, companyStats.ets2.leaderbords_position_race_miles)}\n⠀⠀🚛 **Hardcore Ranking**: \`#${formatNum(rankings.ets.position)}\` ***(${formatNum(rankings.ets.points)}HP)*** ${compare(compRanks.ets.hardcore || 0, rankings.ets.position)}`}
+      {name: ':flag_us: ATS', value: `⠀⠀🛻 **Real Ranking**: \`#${formatNum(companyStats.ats.leaderbords_position_real_miles)}\` ${compare(companyStats.ats.leaderbords_position_real_miles, compRanks.ats.real || 0)} ${rankTrophies.realAts}\n⠀⠀🏎️ **Race Ranking**: \`#${formatNum(companyStats.ats.leaderbords_position_race_miles)}\` ${compare(companyStats.ats.leaderbords_position_race_miles, compRanks.ats.race || 0)} ${rankTrophies.raceAts}\n⠀⠀🚛 **Hardcore Ranking**: \`#${formatNum(rankings.ats.position)}\` ***(${formatNum(rankings.ats.points)}HP)*** ${compare(rankings.ats.position, compRanks.ats.hardcore || 0)} ${rankTrophies.hardcoreAts}`},
+      {name: ':flag_gb: ETS', value: `⠀⠀🛻 **Real Ranking**: \`#${formatNum(companyStats.ets2.leaderbords_position_real_miles)}\` ${compare(companyStats.ets2.leaderbords_position_real_miles, compRanks.ets.real || 0)} ${rankTrophies.realEts}\n⠀⠀🏎️ **Race Ranking**: \`${companyStats.ets2.leaderbords_position_race_miles > 0?`#${formatNum(companyStats.ets2.leaderbords_position_race_miles)}`:'N/A'} ${rankTrophies.raceEts}\` ${compare(companyStats.ets2.leaderbords_position_race_miles, compRanks.ets.race || 0)}\n⠀⠀🚛 **Hardcore Ranking**: \`#${formatNum(rankings.ets.position)}\` ***(${formatNum(rankings.ets.points)}HP)*** ${compare(rankings.ets.position, compRanks.ets.hardcore || 0)} ${rankTrophies.hardcoreEts}`}
     )
     .setColor('Green')
 
