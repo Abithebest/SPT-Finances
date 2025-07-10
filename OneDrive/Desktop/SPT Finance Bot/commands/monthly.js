@@ -156,7 +156,7 @@ module.exports = {
 
     let companyDrivers = new EmbedBuilder()
     .setTitle('👷‍♂️ Trucky Driver Stats')
-    .setDescription('`👷‍♂️ Jobs | 🏆 HC Points`\n`🛣️ Miles | ⚖️ Mass | 💰 Revenue | 💵 Earnings`\n\n' + splitArrays[0].join('\n\n'))
+    .setDescription('`👷‍♂️ Jobs | 🏆 HC Points`\n`🛣️ Distance | ⚖️ Mass | 💰 Revenue | 💵 Earnings`\n\n' + splitArrays[0].join('\n\n'))
     .setColor('Green')
 
     await db.collection('Companies').updateOne({ ServerId: interaction.guildId }, {
