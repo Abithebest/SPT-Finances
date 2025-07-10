@@ -1,4 +1,4 @@
-let { request, verifiedUsers, getObject, formatNum, currency, uppercase, currentDate, db, compare } = require('../utils.js')
+let { request, verifiedUsers, getObject, formatNum, currency, uppercase, currentDate, db, compare, splitArray } = require('../utils.js')
 let { EmbedBuilder, Embed } = require('discord.js')
 
 let monthNames = [ 'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december' ]
@@ -76,7 +76,7 @@ module.exports = {
     let driverSetup = [];
     userData.sort((a, b) => (b.driven_distance_km / 1.609) - (a.driven_distance_km / 1.609)).forEach(data => {
       let driverDistance = data.driven_distance_km / 1.609;
-      driverSetup.push(`**${data.name}**\n\`${formatNum(driverDistance.toFixed(0))}mi.\` | \`${formatNum(data.cargo_mass_t)}t.\` | \`${formatNum(data.revenue)}${currency}\` | \`${formatNum(data.jobs)}\` | \`${formatNum(data.total_earned)}${currency}\``)
+      driverSetup.push(`[**${data.name}**](https://hub.truckyapp.com/user/${data.user_id}) \`👷‍♂️ ${formatNum(data.jobs)}\` | \`🏆 ${formatNum(data.realistic_ldb_points)}HP\`\n\`🛣️ ${formatNum(driverDistance.toFixed(0))}mi.\` | \`⚖️ ${formatNum(data.cargo_mass_t)}t.\` | \`💰 ${formatNum(data.revenue)}${currency}\` | \`💵 ${formatNum(data.total_earned)}${currency}\``)
 
       if(driversRanked.revenue[0] < data.revenue) {
         driversRanked.revenue = [data.revenue, data.name]
@@ -119,9 +119,22 @@ module.exports = {
 
       return trophies;
     })();
-    console.log(rankTrophies)
 
     // Message Setup
+    let embedArrays = new Array()
+    let splitArrays = splitArray(driverSetup)
+    console.log(splitArrays)
+
+    splitArrays.forEach((data, index) => {
+      if(index == 0) return;
+      let PayrollEmbed = new EmbedBuilder()
+        .setDescription(data.join('\n\n'))
+        .setColor('Green')
+
+      embedArrays.push(PayrollEmbed)
+    })
+    console.log(embedArrays)
+
     let companyRankings = new EmbedBuilder()
     .setTitle(`📊 Trucky Company ${uppercase(monthNames[month-1])} ${(month == 1?currentDate.getFullYear() - 1:currentDate.getFullYear()).toString().replace('20', '\'')}`)
     .addFields(
@@ -143,7 +156,7 @@ module.exports = {
 
     let companyDrivers = new EmbedBuilder()
     .setTitle('👷‍♂️ Trucky Driver Stats')
-    .setDescription('`Distance | Weight | Revenue | Jobs | Earnings`\n\n' + driverSetup.join('\n\n'))
+    .setDescription('`👷‍♂️ Jobs | 🏆 HC Points`\n`🛣️ Miles | ⚖️ Mass | 💰 Revenue | 💵 Earnings`\n\n' + splitArrays[0].join('\n\n'))
     .setColor('Green')
 
     await db.collection('Companies').updateOne({ ServerId: interaction.guildId }, {
@@ -173,7 +186,7 @@ module.exports = {
     })
 
     interaction.editReply({
-			embeds: [companyRankings, companyEconomy, companyHighlights, companyDrivers]
+			embeds: [companyRankings, companyEconomy, companyHighlights, companyDrivers, ...embedArrays]
 		})
   }
 }

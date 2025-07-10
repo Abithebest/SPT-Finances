@@ -5,7 +5,7 @@ module.exports = async function({interaction}) {
   let amount = parseInt(interaction.fields.getTextInputValue("amountInput"))
   let created = (new Date()).getTime()
 
-  interaction.reply({
+  await interaction.reply({
     ephemeral: true,
     content: 'Waiting for response...'
   })

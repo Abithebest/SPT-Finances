@@ -21,6 +21,7 @@ module.exports = async function({interaction}) {
 
 	let fields = []
 	if(loanUpdate > 0) {
+		const oldLoan = loan.Amount.Current;
 		loan.Amount.Current -= loanUpdate;
 		if(loan.Amount.Current < 0) {
 			loan.Amount.Current = 0;
@@ -28,6 +29,7 @@ module.exports = async function({interaction}) {
 		loan.LastPayment = new Date().getTime();
 
 		fields = [
+			{name: 'Balance Forward', value: `🏦 \`-${formatNum(oldLoan)}${currency}\``},
 			{name: 'Loan Payment', value: `💰 \`+${formatNum(loanUpdate)}${currency}\``},
 			{name: 'Loan Balance', value: `💵 \`-${formatNum(loan.Amount.Current)}${currency}\``},
 			{name: 'Last Payment', value: `⏰ <t:${(loan.LastPayment / 1000).toFixed(0)}:R>`}
