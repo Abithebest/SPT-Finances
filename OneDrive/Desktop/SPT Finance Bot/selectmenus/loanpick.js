@@ -30,7 +30,7 @@ module.exports = async function({interaction}) {
 
 		fields = [
 			{name: 'Balance Forward', value: `🏦 \`-${formatNum(oldLoan)}${currency}\``},
-			{name: 'Loan Payment', value: `💰 \`+${formatNum(loanUpdate)}${currency}\``},
+			{name: 'Loan Payment', value: `💰 \`+${formatNum(loanUpdate)}${currency}\` | \`#${loan.PaymentNum + 1}\``},
 			{name: 'Loan Balance', value: `💵 \`-${formatNum(loan.Amount.Current)}${currency}\``},
 			{name: 'Last Payment', value: `⏰ <t:${(loan.LastPayment / 1000).toFixed(0)}:R>`}
 		]
@@ -39,7 +39,8 @@ module.exports = async function({interaction}) {
 			$set: {
 				Amount: loan.Amount,
 				LastPayment: loan.LastPayment
-			}
+			},
+			$inc: { PaymentNum: 1 }
 		})
 	} else {
 		fields = [

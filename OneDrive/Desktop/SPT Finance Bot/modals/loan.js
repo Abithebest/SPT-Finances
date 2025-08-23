@@ -33,7 +33,8 @@ module.exports = async function({interaction}) {
     },
     Title: title,
     Created: created,
-    LastPayment: created
+    LastPayment: created,
+    PaymentNum: 0
   })
 
   interaction.editReply({

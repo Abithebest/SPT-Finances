@@ -4,9 +4,12 @@ let specialGarages = [
   22662,
   9706,
   13060,
-  16521,
   22263
 ];
+
+/*
+* Cancelation expenses
+*/
 
 async function getGarage(data) {
 	let [gCode, companyGarages] = await request('v1/company/9559/garages', 'GET')
