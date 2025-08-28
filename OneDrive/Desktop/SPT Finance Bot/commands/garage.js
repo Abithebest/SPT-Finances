@@ -104,13 +104,19 @@ module.exports = {
 		let [mcCode, mechanics] = await request(`v1/company/9559/garage/${garageId}/mechanics`, 'GET')
 		let [vhCode, vehicles] = await request(`v1/company/9559/garage/${garageId}/vehicles`, 'GET')
 		let [drCode, companyDrivers] = await request(`v1/company/9559/members?perPage=9999`, 'GET')
-		let [jobCode, jobs] = await request(`v1/company/9559/jobs?perPage=9999&dateFrom=${dateFromFormatted}&dateTo=${dateToFormatted}&status=completed`, 'GET')
+		let [jobCode, jobs] = await request(`v1/company/9559/jobs?perPage=9999&dateFrom=${dateFromFormatted}&dateTo=${dateToFormatted}`, 'GET')
 		let drivers = new Object()
+		let canceledJobs = new Array()
 
 		if(mtCode == 200) maintenance = JSON.parse(maintenance).data;
 		if(mcCode == 200) mechanics = JSON.parse(mechanics);
 		if(vhCode == 200) vehicles = JSON.parse(vehicles);
-		if(jobCode == 200) jobs = JSON.parse(jobs).data.filter(jData => isDateInRange(jData.updated_at, dateFrom, dateTo));
+		if(jobCode == 200) {
+			jobs = JSON.parse(jobs).data.filter(jData => isDateInRange(jData.updated_at, dateFrom, dateTo));
+			
+			canceledJobs = jobs.filter(cData => cData.status == 'canceled');
+			jobs = jobs.filter(jData => jData.status == 'completed');
+		}
 		if(drCode == 200) companyDrivers = getObject(JSON.parse(companyDrivers).data, 'id');
 
 		let gdriverIds = new Array()
@@ -223,6 +229,7 @@ module.exports = {
 		let truckDamage = 0;
 		let truckRentals = 0;
 		let fineCosts = 0;
+		let cancelationCost = 0;
 
 		gdriverIds.map(driverId => {
 			if(drivers[driverId]) {
@@ -238,6 +245,12 @@ module.exports = {
 			}
 		})
 
+		canceledJobs.forEach(cData => {
+			if(drivers[cData.driver.id]) {
+				cancelationCost += cData.revenue * -1;
+			}
+		})
+
 		let mechanicSalaries = 0;
 		for(let i=0;i<mechanics.length;i++) {
 			let mechanic = mechanics[i];
@@ -249,7 +262,7 @@ module.exports = {
 			}
 		}
 
-		let description = `🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🏪 **${garage.city.name} Office Expenses ${formattedWeek}**${gFuelCost > 0 ? `\n⠀⠀⛽ Fuel Cost \`-${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))} gl.)\``: ''}${replacementCosts > 0 ? `\n⠀⠀🛠️ Part Replacement Costs: \`-${formatNum(replacementCosts.toFixed(0))}${currency}\``:''}${truckDamage > 0 ? `\n⠀⠀💥 Truck Damage Expenses: \`-${formatNum(truckDamage.toFixed(0))}${currency}\``:''}${truckRentals > 0 ? `\n⠀⠀🛻 Truck Rentals: \`-${formatNum(truckRentals.toFixed(0))}${currency}\``:''}${fineCosts > 0 ? `\n⠀⠀🎫 Fines: \`-${formatNum(fineCosts.toFixed(0))}${currency}\``:''}`;
+		let description = `🗓️ \`${dateTo.getMonth() + 1}/${dateTo.getDate() < 10? `0${dateTo.getDate()}`:dateTo.getDate()}/${dateTo.getFullYear()-2000}\`\n🏪 **${garage.city.name} Office Expenses ${formattedWeek}**${cancelationCost > 0 ? `\n ⠀⠀📉 Job Cancelations \`-${formatNum(cancelationCost.toFixed(0))}${currency}\``:''}${gFuelCost > 0 ? `\n⠀⠀⛽ Fuel Cost \`-${formatNum(gFuelCost.toFixed(0))}${currency} (${formatNum(gFuelUsed.toFixed(0))} gl.)\``: ''}${replacementCosts > 0 ? `\n⠀⠀🛠️ Part Replacement Costs: \`-${formatNum(replacementCosts.toFixed(0))}${currency}\``:''}${truckDamage > 0 ? `\n⠀⠀💥 Truck Damage Expenses: \`-${formatNum(truckDamage.toFixed(0))}${currency}\``:''}${truckRentals > 0 ? `\n⠀⠀🛻 Truck Rentals: \`-${formatNum(truckRentals.toFixed(0))}${currency}\``:''}${fineCosts > 0 ? `\n⠀⠀🎫 Fines: \`-${formatNum(fineCosts.toFixed(0))}${currency}\``:''}`;
 		let formattedDrivers = new Array()
 		gdriverIds.map(driverId => {
 			if(!drivers[driverId]) return;
