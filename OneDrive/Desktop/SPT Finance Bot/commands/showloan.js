@@ -1,4 +1,3 @@
-
 const { db, verifiedUsers, formatNum, currency } = require('../utils.js')
 const { StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } = require('discord.js');
 
