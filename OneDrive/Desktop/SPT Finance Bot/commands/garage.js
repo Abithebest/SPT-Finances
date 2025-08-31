@@ -246,7 +246,8 @@ module.exports = {
 		})
 
 		canceledJobs.forEach(cData => {
-			if(drivers[cData.driver.id]) {
+			if(gdriverIds.includes(cData.driver.id)) {
+				console.log(cData)
 				cancelationCost += cData.revenue * -1;
 			}
 		})

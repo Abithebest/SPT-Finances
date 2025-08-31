@@ -13,6 +13,9 @@ module.exports = {
         ]
     },
     func: async function({ interaction, params, optionData }) {
-        
+        interaction.reply({
+            content: 'Command not ready.',
+            ephemeral: true
+        })
     }
 }
