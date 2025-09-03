@@ -7,10 +7,6 @@ let specialGarages = [
   22263
 ];
 
-/*
-* Cancelation expenses
-*/
-
 async function getGarage(data) {
 	let [gCode, companyGarages] = await request('v1/company/9559/garages', 'GET')
 
@@ -89,7 +85,7 @@ module.exports = {
 
 		dateFrom.setUTCHours(0,0,0,0)
 		dateTo.setUTCHours(23,59,59,59)
-    dateFrom.setDate(dateFrom.getDate() + 1)
+    	dateFrom.setDate(dateFrom.getDate() + 1)
 		dateTo.setDate(dateTo.getDate() + 1)
 
 		let dateFromMonth = dateFrom.getMonth() + 1;

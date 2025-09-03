@@ -1,3 +1,6 @@
+let { request, verifiedUsers, isDateInRange, getObject, formatNum, currency, uppercase } = require('../utils.js')
+let { EmbedBuilder } = require('discord.js')
+
 module.exports = {
     command: {
         name: 'vtlog',
@@ -9,13 +12,36 @@ module.exports = {
                 type: 3,
                 required: true,
                 autocomplete: true
-            }
+            },
+			{
+				name: 'from',
+				description: 'Start from this day. MM-DD-YYYY',
+				type: 3,
+				required: true,
+				autocomplete: true
+			},
+			{
+				name: 'to',
+				description: 'End on this day. MM-DD-YYYY',
+				type: 3,
+				required: true,
+				autocomplete: true
+			}
         ]
     },
     func: async function({ interaction, params, optionData }) {
-        interaction.reply({
-            content: 'Command not ready.',
-            ephemeral: true
-        })
+        if(!verifiedUsers.includes(interaction.user.id)) {
+            interaction.reply({
+                ephemeral: true,
+                content: 'Sorry, this command isnt able to be used by you.'
+            })
+
+            return;
+        }
+
+        await interaction.deferReply()
+
+        let query = optionData(params[0]).toLowerCase()
+
     }
 }
